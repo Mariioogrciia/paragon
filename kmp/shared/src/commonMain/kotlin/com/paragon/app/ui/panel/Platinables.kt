@@ -1,5 +1,8 @@
 package com.paragon.app.ui.panel
 
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.draw.alpha
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -63,6 +66,8 @@ private data class Fila(
     val instalado: Boolean,
     val suscripcion: Boolean,
     val ocultable: Boolean,
+    /** En «Mis cazas» (12 nov 2026). */
+    val caza: Boolean = false,
 )
 
 private fun fila(p: PlatinableDto): Fila {
@@ -104,6 +109,7 @@ private fun fila(p: PlatinableDto): Fila {
         instalado = p.instalado,
         suscripcion = p.suscripcion != null,
         ocultable = true,
+        caza = p.caza,
     )
 }
 
@@ -138,8 +144,24 @@ fun SeccionPlatinables(
     onVerTodo: () -> Unit,
     onRetirar: (String) -> Unit = {},
     onRetirarConsola: (String) -> Unit = {},
+    /** 🎯 de cada fila (12 nov 2026): añadir o quitar de «Mis cazas». Devuelve si se pudo. */
+    onCaza: suspend (String, Boolean) -> Boolean = { _, _ -> true },
 ) {
     var quitados by remember { mutableStateOf(emptySet<String>()) }
+    var cazas by remember(datos) { mutableStateOf((datos.cerca + datos.jugando + datos.faciles).filter { it.caza }.map { it.id }.toSet()) }
+    var cazaLlena by remember { mutableStateOf(false) }
+    val ambito = rememberCoroutineScope()
+    fun alternarCaza(id: String) {
+        val nueva = id !in cazas
+        cazaLlena = false
+        cazas = if (nueva) cazas + id else cazas - id
+        ambito.launch {
+            if (!onCaza(id, nueva) && nueva) {
+                cazas = cazas - id
+                cazaLlena = true
+            }
+        }
+    }
     var sugerencia by remember(datos) { mutableStateOf(datos.sugerenciaRetirar) }
     val listas = listOf(
         T.plat_cerca to datos.cerca.map(::fila),
@@ -214,6 +236,9 @@ fun SeccionPlatinables(
             lineHeight = 16.sp,
             modifier = Modifier.padding(top = 8.dp, bottom = 8.dp, start = 4.dp, end = 4.dp),
         )
+        if (cazaLlena) {
+            Text("🎯 " + Textos.t(T.caza_llena), color = Danger, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(bottom = 6.dp, start = 4.dp))
+        }
         if (lista.isEmpty()) {
             Text(Textos.t(T.plat_vacio), color = Muted, fontSize = 13.sp, modifier = Modifier.padding(vertical = 12.dp, horizontal = 4.dp))
         } else {
@@ -221,7 +246,12 @@ fun SeccionPlatinables(
                 val visibles = if (todos) lista else lista.take(VISIBLES)
                 visibles.forEachIndexed { i, f ->
                     if (i > 0) SeparadorFila()
-                    FilaPlatinable(f, onRetirar = if (f.ocultable) ({ quitados = quitados + f.id; onRetirar(f.id) }) else null) { onAbrir(f.id) }
+                    FilaPlatinable(
+                        f,
+                        onRetirar = if (f.ocultable) ({ quitados = quitados + f.id; onRetirar(f.id) }) else null,
+                        caza = if (f.ocultable) f.id in cazas else null,
+                        onCaza = { alternarCaza(f.id) },
+                    ) { onAbrir(f.id) }
                 }
             }
             if (lista.size > VISIBLES) {
@@ -256,7 +286,14 @@ private fun Pastilla(texto: String, activa: Boolean, pequena: Boolean = false, o
 }
 
 @Composable
-private fun FilaPlatinable(f: Fila, onRetirar: (() -> Unit)?, onClick: () -> Unit) {
+private fun FilaPlatinable(
+    f: Fila,
+    onRetirar: (() -> Unit)?,
+    /** null = sin botón 🎯 (doble platino). */
+    caza: Boolean? = null,
+    onCaza: () -> Unit = {},
+    onClick: () -> Unit,
+) {
     Row(
         Modifier.fillMaxWidth().clickable(onClick = onClick).padding(start = 12.dp, end = 2.dp, top = 10.dp, bottom = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -289,12 +326,54 @@ private fun FilaPlatinable(f: Fila, onRetirar: (() -> Unit)?, onClick: () -> Uni
             }
         }
         Text("${f.percent}%", color = Accent, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+        if (caza != null) {
+            IconButton(onClick = onCaza, modifier = Modifier.size(36.dp)) {
+                Text(
+                    "🎯",
+                    fontSize = 15.sp,
+                    modifier = Modifier.alpha(if (caza) 1f else 0.3f),
+                )
+            }
+        }
         if (onRetirar != null) {
             IconButton(onClick = onRetirar, modifier = Modifier.size(36.dp)) {
                 Icon(Icons.Default.Close, contentDescription = Textos.t(T.retirados_ya_no), tint = Muted, modifier = Modifier.size(16.dp))
             }
         } else {
             Box(Modifier.size(12.dp))
+        }
+    }
+}
+
+/**
+ * «Reanuda tus cazas» en el Panel (12 nov 2026, como la web): los juegos que
+ * has elegido platinar (🎯 en la ficha o en «A un paso del platino»), en el
+ * orden en que los elegiste. La × los quita de aquí sin tocar nada más.
+ */
+@Composable
+fun SeccionCazas(cazas: List<PlatinableDto>, onAbrir: (String) -> Unit, onQuitar: (String) -> Unit) {
+    var quitadas by remember { mutableStateOf(emptySet<String>()) }
+    val lista = cazas.filter { it.id !in quitadas }.map(::fila)
+    TituloSeccion("🎯 " + Textos.t(T.cazas_titulo))
+    Column(Modifier.padding(horizontal = 20.dp).animateContentSize()) {
+        if (lista.isEmpty()) {
+            Text(
+                Textos.t(T.cazas_vacio),
+                color = Muted,
+                fontSize = 13.sp,
+                lineHeight = 18.sp,
+                modifier = Modifier.fillMaxWidth()
+                    .clip(RoundedCornerShape(radio(14)))
+                    .border(1.dp, Border, RoundedCornerShape(radio(14)))
+                    .padding(14.dp),
+            )
+        } else {
+            GrupoNativo {
+                lista.forEachIndexed { i, f ->
+                    if (i > 0) SeparadorFila()
+                    FilaPlatinable(f, onRetirar = { quitadas = quitadas + f.id; onQuitar(f.id) }) { onAbrir(f.id) }
+                }
+            }
         }
     }
 }

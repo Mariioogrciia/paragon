@@ -35,6 +35,10 @@
     "allTrophiesHeading": "Alle Trophäen",
     "trophiesEarnedOf": "{earned} von {total} erhalten",
     "marcas": {
+      "caza": "Zu meinen Jagden",
+      "cazaActiva": "In meinen Jagden",
+      "cazaAyuda": "Erscheint ganz oben auf der Startseite unter „Setze deine Jagden fort“.",
+      "cazaLlena": "Du hast schon {n} Jagden: entferne eine, um diese hinzuzufügen.",
       "instalado": "Installiert",
       "instaladoAyuda": "Gerade installiert: Es erscheint im Filter „Installiert“ bei „Kurz vor Platin“, damit du siehst, welche Platins du sofort angehen kannst.",
       "oculto": "In deinem Profil verborgen",

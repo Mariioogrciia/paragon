@@ -225,6 +225,9 @@ private fun GameDetailContent(
     var instalado by remember(gameId) { mutableStateOf(game.marcas?.instalado == true) }
     var ocultoPerfil by remember(gameId) { mutableStateOf(game.marcas?.ocultoPerfil == true) }
     var fechaObjetivo by remember(gameId) { mutableStateOf(game.marcas?.fechaObjetivo) }
+    // «Mis cazas» (12 nov 2026): sale arriba del Panel, en «Reanuda tus cazas».
+    var caza by remember(gameId) { mutableStateOf(game.marcas?.caza == true) }
+    var cazaLlena by remember(gameId) { mutableStateOf(false) }
     var showFecha by remember { mutableStateOf(false) }
     fun marca(tipo: String, valor: String, activo: Boolean) {
         coroutineScope.launch {
@@ -414,6 +417,27 @@ private fun GameDetailContent(
                                 }
                             } ?: Textos.t(T.marca_fecha)
                         } else null,
+                        caza = caza,
+                        cazaLlena = cazaLlena,
+                        onToggleCaza = {
+                            val nueva = !caza
+                            caza = nueva
+                            cazaLlena = false
+                            coroutineScope.launch {
+                                val hecho = try {
+                                    com.paragon.app.data.network.ApiClient.retiradosApi(tokenStore)
+                                        .cambiar(com.paragon.shared.red.CambiarRetiradoRequest("caza", gameId, nueva)).ok
+                                } catch (e: kotlinx.coroutines.CancellationException) {
+                                    throw e
+                                } catch (_: Exception) {
+                                    false
+                                }
+                                if (!hecho) {
+                                    caza = !nueva
+                                    cazaLlena = nueva
+                                }
+                            }
+                        },
                         onToggleInstalado = { instalado = !instalado; marca("instalado", gameId, instalado) },
                         onToggleOculto = { ocultoPerfil = !ocultoPerfil; marca("oculto_perfil", gameId, ocultoPerfil) },
                         onFecha = { showFecha = true },
@@ -783,6 +807,9 @@ private fun GameActionsRow(
     onToggleInstalado: () -> Unit = {},
     onToggleOculto: () -> Unit = {},
     onFecha: () -> Unit = {},
+    caza: Boolean = false,
+    cazaLlena: Boolean = false,
+    onToggleCaza: () -> Unit = {},
 ) {
     Column {
     Row(
@@ -822,6 +849,9 @@ private fun GameActionsRow(
         fechaTexto?.let { texto ->
             ActionChip(label = "🎯 $texto", active = true, accentColor = Gold, onClick = onFecha)
         }
+        if (!platinoConseguido) {
+            ActionChip(label = "🎯 " + Textos.t(if (caza) T.marca_caza_activa else T.marca_caza), active = caza, accentColor = dynamicColor, onClick = onToggleCaza)
+        }
         ActionChip(label = "💾 " + Textos.t(T.marca_instalado), active = instalado, accentColor = dynamicColor, onClick = onToggleInstalado)
         ActionChip(label = "🙈 " + Textos.t(T.marca_oculto), active = ocultoPerfil, accentColor = dynamicColor, onClick = onToggleOculto)
         ActionChip(
@@ -845,6 +875,8 @@ private fun GameActionsRow(
     }
     // Qué hace cada marca (11 nov 2026, «el botón de instalado, ¿qué es?»).
     listOfNotNull(
+        if (caza) "🎯 " + Textos.t(T.marca_caza_ayuda) else null,
+        if (cazaLlena) "🎯 " + Textos.t(T.caza_llena) else null,
         if (instalado) Textos.t(T.marca_instalado_ayuda) else null,
         if (ocultoPerfil) Textos.t(T.marca_oculto_ayuda) else null,
     ).forEach { ayuda ->

@@ -11,9 +11,10 @@ import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { gameProgress, summarise } from "@/lib/stats";
 import { platinables, type Platinable } from "@/lib/platinables";
 import { getRetirados } from "@/lib/retirados";
-import { consolasParaRetirar, dispositivosDe, nombreConsola, sinRetirados } from "@/lib/retiradosReglas";
+import { MAX_CAZAS, cazasDeBiblioteca, consolasParaRetirar, dispositivosDe, nombreConsola, sinRetirados } from "@/lib/retiradosReglas";
 import { doblesPlatinos, extrasPlatinables, type DoblePlatino, type ExtrasJuego } from "@/lib/platinablesExtras";
 import { PlatinablesPanel, type FilaPlatinable } from "@/components/PlatinablesPanel";
+import { MisCazas, type CazaFila } from "@/components/MisCazas";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { getFeed } from "@/lib/feed";
 import { UpcomingGames } from "@/components/UpcomingGames";
@@ -112,6 +113,31 @@ async function Inicio() {
     doblesPlatinos(sinRetirados(games, marcas)).catch(() => []),
   ]);
   const sugerenciaRetirar = consolasParaRetirar(games, marcas)[0] ?? null;
+
+  // «Reanuda tus cazas» (12 nov 2026): lo que has elegido platinar, arriba del todo.
+  const ahoraMs = new Date().getTime();
+  const cazas: CazaFila[] = cazasDeBiblioteca(games, marcas).map((g) => {
+    const faltan = Math.max(0, g.definedTotal - g.earnedTotal);
+    const dias = g.lastPlayedAt ? Math.max(0, Math.floor((ahoraMs - new Date(g.lastPlayedAt).getTime()) / 86_400_000)) : null;
+    const horas = g.hltb?.completionist ? Math.max(0, Math.round(g.hltb.completionist - (g.playtimeMinutes ?? 0) / 60)) : null;
+    return {
+      id: g.id,
+      titulo: g.title,
+      iconUrl: g.iconUrl ?? null,
+      percent: g.progressPercent,
+      href: `/u/${profile.handle}/${g.id}`,
+      faltan:
+        g.earnedTotal === 0
+          ? t("platinables.sinEmpezar", { count: faltan })
+          : (g.defined?.platinum ?? 0) > 0
+            ? t("platinables.faltan", { count: faltan })
+            : t("platinables.faltanCien", { count: faltan }),
+      extra: [
+        ...(g.earnedTotal > 0 && dias !== null && dias <= 365 ? [t("platinables.jugado", { count: dias })] : []),
+        ...(horas ? [t("platinables.horas", { n: horas })] : []),
+      ],
+    };
+  });
   const nearPlatinum = listas.cerca.slice(0, 1).map((p) => ({ game: p.game, progress: gameProgress(p.game) }));
   const fila = (p: Platinable): FilaPlatinable => {
     const e = extras.get(p.game.id);
@@ -262,6 +288,7 @@ async function Inicio() {
               ? { dispositivo: sugerenciaRetirar.dispositivo, texto: t("platinables.retirarPregunta", { anios: sugerenciaRetirar.anios, consola: nombreConsola(sugerenciaRetirar.dispositivo) }) }
               : null
           }
+          cazasIniciales={marcas.cazas}
           nombresConsola={Object.fromEntries(Object.values(listas).flat().flatMap((p) => p.dispositivos).map((d) => [d, nombreConsola(d)]))}
           textos={{
             cerca: t("platinables.cerca"),
@@ -285,6 +312,9 @@ async function Inicio() {
             suscripcion: t("platinables.filtroSuscripcion"),
             quitar: t("platinables.retirarSi"),
             dejar: t("platinables.retirarNo"),
+            cazar: t("cazas.cazar"),
+            enCazas: t("cazas.enCazas"),
+            cazaLlena: t("cazas.llena", { n: MAX_CAZAS }),
           }}
         />
       </div>
@@ -521,6 +551,13 @@ async function Inicio() {
       </div>
 
       <div className="cabina">
+        <div className="cabina-celda lg:col-span-12">
+          <MisCazas
+            cazas={cazas}
+            textos={{ titulo: t("cazas.titulo"), sub: t("cazas.sub"), vacio: t("cazas.vacio"), quitar: t("cazas.quitar") }}
+          />
+        </div>
+
         {hayHeroe ? (
           <>
             <div className="cabina-celda lg:col-span-8">{nearPlatinumSection}</div>

@@ -194,6 +194,9 @@
     <string name="carpeta_vacio_sheet">Aún no tienes carpetas. Crea una aquí abajo.</string>
     <string name="carpeta_vacio_sub">Agrupa tus juegos como quieras — por saga, por plataforma, por lo que sea — y créalas con el + de arriba.</string>
     <string name="carpetas_titulo">Carpetas</string>
+    <string name="caza_llena">Ya tienes 8 cazas: quita alguna para añadir otra.</string>
+    <string name="cazas_titulo">Reanuda tus cazas</string>
+    <string name="cazas_vacio">Aún no has elegido ninguna caza. Pulsa 🎯 en la ficha de un juego o en «A un paso del platino» y saldrá aquí.</string>
     <string name="clan_abandonar">Abandonar clan</string>
     <string name="clan_abandonar_borra">Abandonar clan (lo borra)</string>
     <string name="clan_abandonar_propio">¿Abandonar tu propio clan?</string>
@@ -677,6 +680,9 @@
     <string name="main_cerrar_busqueda">Cerrar búsqueda</string>
     <string name="main_racha">Racha de %1$s días</string>
     <string name="main_sin_racha">Sin racha activa</string>
+    <string name="marca_caza">A mis cazas</string>
+    <string name="marca_caza_activa">En mis cazas</string>
+    <string name="marca_caza_ayuda">Sale arriba del todo en el Panel, en «Reanuda tus cazas».</string>
     <string name="marca_dos_semanas">En dos semanas</string>
     <string name="marca_fecha">Fecha objetivo</string>
     <string name="marca_fecha_titulo">¿Para cuándo lo quieres?</string>

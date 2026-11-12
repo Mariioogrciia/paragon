@@ -35,6 +35,10 @@
     "allTrophiesHeading": "Todos os troféus",
     "trophiesEarnedOf": "{earned} de {total} conquistados",
     "marcas": {
+      "caza": "Às minhas caçadas",
+      "cazaActiva": "Nas minhas caçadas",
+      "cazaAyuda": "Aparece no topo do início, em «Retoma as tuas caçadas».",
+      "cazaLlena": "Já tens {n} caçadas: tira uma para adicionar esta.",
       "instalado": "Instalado",
       "instaladoAyuda": "Instalado agora: aparece no filtro «Instalados» de «A um passo da platina», para veres que platinas podes ir buscar já.",
       "oculto": "Oculto no teu perfil",

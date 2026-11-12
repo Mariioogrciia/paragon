@@ -192,6 +192,9 @@
     <string name="carpeta_vacio_sheet">Du hast noch keine Ordner. Erstell unten einen.</string>
     <string name="carpeta_vacio_sub">Gruppiere deine Spiele, wie du willst — nach Reihe, Plattform, egal — und erstelle Ordner mit dem + oben.</string>
     <string name="carpetas_titulo">Ordner</string>
+    <string name="caza_llena">Du hast schon 8 Jagden: entferne eine, um eine weitere hinzuzufügen.</string>
+    <string name="cazas_titulo">Setze deine Jagden fort</string>
+    <string name="cazas_vacio">Du hast noch keine Jagd gewählt. Tippe auf 🎯 auf einer Spielseite oder bei „Kurz vor Platin“.</string>
     <string name="clan_abandonar">Clan verlassen</string>
     <string name="clan_abandonar_borra">Clan verlassen (löscht ihn)</string>
     <string name="clan_abandonar_propio">Deinen eigenen Clan verlassen?</string>
@@ -675,6 +678,9 @@
     <string name="main_cerrar_busqueda">Suche schließen</string>
     <string name="main_racha">%1$s-Tage-Serie</string>
     <string name="main_sin_racha">Keine aktive Serie</string>
+    <string name="marca_caza">Zu meinen Jagden</string>
+    <string name="marca_caza_activa">In meinen Jagden</string>
+    <string name="marca_caza_ayuda">Erscheint ganz oben auf der Startseite unter „Setze deine Jagden fort“.</string>
     <string name="marca_dos_semanas">In zwei Wochen</string>
     <string name="marca_fecha">Zieldatum</string>
     <string name="marca_fecha_titulo">Bis wann willst du es?</string>

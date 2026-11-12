@@ -2,6 +2,7 @@
 import Link from "@/components/Enlace";
 import { notFound } from "next/navigation";
 import { getRetirados } from "@/lib/retirados";
+import { MAX_CAZAS } from "@/lib/retiradosReglas";
 import { extrasPlatinables } from "@/lib/platinablesExtras";
 import { MarcasJuego } from "@/components/MarcasJuego";
 import { getTranslations, getLocale } from "next-intl/server";
@@ -313,7 +314,13 @@ export default async function JuegoPage({
                   ocultoInicial={marcas.ocultosPerfil.has(game.id)}
                   reservado={!progress.platinumEarned && hito?.reservado?.gameId === game.id}
                   fechaInicial={marcas.fechaObjetivo}
+                  cazaInicial={marcas.cazas.includes(game.id)}
+                  platinado={progress.platinumEarned}
                   textos={{
+                    caza: t("GameDetailPage.marcas.caza"),
+                    cazaActiva: t("GameDetailPage.marcas.cazaActiva"),
+                    cazaAyuda: t("GameDetailPage.marcas.cazaAyuda"),
+                    cazaLlena: t("GameDetailPage.marcas.cazaLlena", { n: MAX_CAZAS }),
                     instalado: t("GameDetailPage.marcas.instalado"),
                     instaladoAyuda: t("GameDetailPage.marcas.instaladoAyuda"),
                     oculto: t("GameDetailPage.marcas.oculto"),

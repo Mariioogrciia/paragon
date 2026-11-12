@@ -29,10 +29,11 @@ export async function PUT(req: Request) {
   const userId = await getMobileUserId(req);
   if (!userId) return errorMovil(req, "No autenticado", 401);
   const cuerpo = (await req.json().catch(() => null)) as { tipo?: unknown; valor?: unknown; retirado?: unknown } | null;
-  const tipos = ["dispositivo", "juego", "instalado", "oculto_perfil", "fecha_objetivo"] as const;
+  const tipos = ["dispositivo", "juego", "instalado", "oculto_perfil", "fecha_objetivo", "caza"] as const;
   if (!cuerpo || !tipos.includes(cuerpo.tipo as (typeof tipos)[number]) || typeof cuerpo.valor !== "string") {
     return errorMovil(req, "Datos no válidos", 400);
   }
-  await cambiarRetirado(userId, cuerpo.tipo as (typeof tipos)[number], cuerpo.valor, cuerpo.retirado === true);
-  return NextResponse.json(await estado(userId));
+  const ok = await cambiarRetirado(userId, cuerpo.tipo as (typeof tipos)[number], cuerpo.valor, cuerpo.retirado === true);
+  // `ok: false` = no se pudo (por ahora, «Mis cazas» ya tiene MAX_CAZAS).
+  return NextResponse.json({ ...(await estado(userId)), ok });
 }

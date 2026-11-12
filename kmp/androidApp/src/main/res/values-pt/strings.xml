@@ -192,6 +192,9 @@
     <string name="carpeta_vacio_sheet">Ainda não tens pastas. Cria uma aqui em baixo.</string>
     <string name="carpeta_vacio_sub">Agrupa os teus jogos como quiseres — por saga, por plataforma, pelo que for — e cria pastas com o + lá em cima.</string>
     <string name="carpetas_titulo">Pastas</string>
+    <string name="caza_llena">Já tens 8 caçadas: tira uma para juntar outra.</string>
+    <string name="cazas_titulo">Retoma as tuas caçadas</string>
+    <string name="cazas_vacio">Ainda não escolheste nenhuma caçada. Toca em 🎯 na ficha de um jogo ou em «A um passo da platina».</string>
     <string name="clan_abandonar">Sair do clã</string>
     <string name="clan_abandonar_borra">Sair do clã (apaga-o)</string>
     <string name="clan_abandonar_propio">Sair do teu próprio clã?</string>
@@ -675,6 +678,9 @@
     <string name="main_cerrar_busqueda">Fechar pesquisa</string>
     <string name="main_racha">Série de %1$s dias</string>
     <string name="main_sin_racha">Sem série ativa</string>
+    <string name="marca_caza">Às minhas caçadas</string>
+    <string name="marca_caza_activa">Nas minhas caçadas</string>
+    <string name="marca_caza_ayuda">Aparece no topo do início, em «Retoma as tuas caçadas».</string>
     <string name="marca_dos_semanas">Daqui a duas semanas</string>
     <string name="marca_fecha">Data objetivo</string>
     <string name="marca_fecha_titulo">Para quando o queres?</string>

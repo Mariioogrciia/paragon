@@ -17,6 +17,8 @@ export function MarcasJuego({
   ocultoInicial,
   reservado,
   fechaInicial,
+  cazaInicial = false,
+  platinado = false,
   textos,
 }: {
   gameId: string;
@@ -24,9 +26,14 @@ export function MarcasJuego({
   ocultoInicial: boolean;
   reservado: boolean;
   fechaInicial: string | null;
-  textos: { instalado: string; instaladoAyuda: string; oculto: string; ocultoTitulo: string; fecha: string; quedan: string; queda1: string; hoy: string; tarde: string; tarde1: string; quitarFecha: string };
+  /** En «Mis cazas» (12 nov 2026). Con el juego ya platinado no sale el botón. */
+  cazaInicial?: boolean;
+  platinado?: boolean;
+  textos: { caza: string; cazaActiva: string; cazaAyuda: string; cazaLlena: string; instalado: string; instaladoAyuda: string; oculto: string; ocultoTitulo: string; fecha: string; quedan: string; queda1: string; hoy: string; tarde: string; tarde1: string; quitarFecha: string };
 }) {
   const [instalado, setInstalado] = useState(instaladoInicial);
+  const [caza, setCaza] = useState(cazaInicial);
+  const [cazaLlena, setCazaLlena] = useState(false);
   const [oculto, setOculto] = useState(ocultoInicial);
   const [fecha, setFecha] = useState(fechaInicial ?? "");
   const [, empezar] = useTransition();
@@ -39,6 +46,28 @@ export function MarcasJuego({
   return (
     <div className="mt-3">
     <div className="flex flex-wrap items-center gap-3">
+      {!platinado && (
+        <ToggleChip
+          active={caza}
+          size="md"
+          title={textos.cazaAyuda}
+          onClick={() => {
+            const nueva = !caza;
+            setCaza(nueva);
+            setCazaLlena(false);
+            empezar(async () => {
+              const { ok } = await cambiarRetiradoAction("caza", gameId, nueva);
+              // Llena (MAX_CAZAS): vuelve a como estaba y se explica debajo.
+              if (!ok && nueva) {
+                setCaza(false);
+                setCazaLlena(true);
+              }
+            });
+          }}
+        >
+          🎯 {caza ? textos.cazaActiva : textos.caza}
+        </ToggleChip>
+      )}
       <ToggleChip
         active={instalado}
         size="md"
@@ -95,8 +124,10 @@ export function MarcasJuego({
     </div>
     {/* Qué hace cada marca (11 nov 2026, «el botón de instalado, ¿qué es?»): el
         title no se ve en el móvil, así que al marcarla se explica debajo. */}
-    {(instalado || oculto) && (
+    {(instalado || oculto || caza || cazaLlena) && (
       <div className="mt-2 space-y-0.5 text-xs text-muted">
+        {caza && <p>🎯 {textos.cazaAyuda}</p>}
+        {cazaLlena && <p className="font-semibold text-[var(--danger)]">🎯 {textos.cazaLlena}</p>}
         {instalado && <p>💾 {textos.instaladoAyuda}</p>}
         {oculto && <p>🙈 {textos.ocultoTitulo}</p>}
       </div>

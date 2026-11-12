@@ -60,7 +60,7 @@ data class GameDetailResponse(
 )
 
 @Serializable
-data class MarcasJuegoDto(val instalado: Boolean = false, val ocultoPerfil: Boolean = false, val fechaObjetivo: String? = null)
+data class MarcasJuegoDto(val instalado: Boolean = false, val ocultoPerfil: Boolean = false, val fechaObjetivo: String? = null, val caza: Boolean = false)
 
 /** Una fase del plan: perdibles, historia, coleccionables, online, habilidad, grindeo o limpieza. */
 @Serializable

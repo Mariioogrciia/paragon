@@ -192,6 +192,9 @@
     <string name="carpeta_vacio_sheet">Non hai ancora cartelle. Creane una qui sotto.</string>
     <string name="carpeta_vacio_sub">Raggruppa i tuoi giochi come vuoi — per saga, per piattaforma, per qualsiasi cosa — e crea le cartelle con il + in alto.</string>
     <string name="carpetas_titulo">Cartelle</string>
+    <string name="caza_llena">Hai già 8 cacce: togline una per aggiungerne un\'altra.</string>
+    <string name="cazas_titulo">Riprendi le tue cacce</string>
+    <string name="cazas_vacio">Non hai ancora scelto nessuna caccia. Tocca 🎯 nella scheda di un gioco o in «A un passo dal platino».</string>
     <string name="clan_abandonar">Lascia il clan</string>
     <string name="clan_abandonar_borra">Lascia il clan (lo elimina)</string>
     <string name="clan_abandonar_propio">Lasciare il tuo clan?</string>
@@ -675,6 +678,9 @@
     <string name="main_cerrar_busqueda">Chiudi ricerca</string>
     <string name="main_racha">Serie di %1$s giorni</string>
     <string name="main_sin_racha">Nessuna serie attiva</string>
+    <string name="marca_caza">Alle mie cacce</string>
+    <string name="marca_caza_activa">Nelle mie cacce</string>
+    <string name="marca_caza_ayuda">Compare in cima alla home, in «Riprendi le tue cacce».</string>
     <string name="marca_dos_semanas">Tra due settimane</string>
     <string name="marca_fecha">Data obiettivo</string>
     <string name="marca_fecha_titulo">Entro quando lo vuoi?</string>

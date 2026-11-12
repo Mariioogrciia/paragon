@@ -76,7 +76,7 @@ data class ConsolaRetiradaDto(val dispositivo: String, val juegos: Int = 0, val 
 data class JuegoRetiradoDto(val id: String, val titulo: String, val iconUrl: String? = null)
 
 @Serializable
-data class RetiradosDto(val consolas: List<ConsolaRetiradaDto> = emptyList(), val juegos: List<JuegoRetiradoDto> = emptyList())
+data class RetiradosDto(val consolas: List<ConsolaRetiradaDto> = emptyList(), val juegos: List<JuegoRetiradoDto> = emptyList(), val ok: Boolean = true)
 
 @Serializable
 data class CambiarRetiradoRequest(val tipo: String, val valor: String, val retirado: Boolean)

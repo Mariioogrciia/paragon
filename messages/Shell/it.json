@@ -336,6 +336,15 @@
       "retirarPregunta": "Sono {anios} anni che non giochi a niente su {consola}. La togli dai suggerimenti?",
       "retirarSi": "Toglila",
       "retirarNo": "No, ce l'ho"
+    },
+    "cazas": {
+      "titulo": "Riprendi le tue cacce",
+      "sub": "I platini che hai scelto di inseguire.",
+      "vacio": "Non hai ancora scelto nessuna caccia. Tocca 🎯 nella scheda di un gioco o in «A un passo dal platino» e comparirà qui.",
+      "quitar": "Togli dalle mie cacce",
+      "cazar": "Aggiungi alle mie cacce",
+      "enCazas": "Nelle mie cacce · togli",
+      "llena": "Hai già {n} cacce: togline una sopra per aggiungerne un'altra."
     }
   },
   "Ejemplo": {

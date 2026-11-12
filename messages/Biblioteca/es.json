@@ -35,6 +35,10 @@
     "allTrophiesHeading": "Todos los trofeos",
     "trophiesEarnedOf": "{earned} de {total} conseguidos",
     "marcas": {
+      "caza": "A mis cazas",
+      "cazaActiva": "En mis cazas",
+      "cazaAyuda": "Sale arriba del todo en el inicio, en «Reanuda tus cazas», para retomarlo de un toque.",
+      "cazaLlena": "Ya tienes {n} cazas: quita alguna para añadir esta.",
       "instalado": "Instalado",
       "instaladoAyuda": "Lo tienes instalado ahora: sale en el filtro «Instalados» de «A un paso del platino», para ver qué platinos puedes ir a sacar ya.",
       "oculto": "Oculto en tu perfil",

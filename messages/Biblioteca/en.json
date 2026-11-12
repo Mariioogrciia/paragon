@@ -35,6 +35,10 @@
     "allTrophiesHeading": "All trophies",
     "trophiesEarnedOf": "{earned} of {total} earned",
     "marcas": {
+      "caza": "Add to my hunts",
+      "cazaActiva": "In my hunts",
+      "cazaAyuda": "It shows up at the top of your home page, in “Resume your hunts”, one tap away.",
+      "cazaLlena": "You already have {n} hunts: remove one to add this.",
       "instalado": "Installed",
       "instaladoAyuda": "Installed right now: it shows up in the “Installed” filter of “One step from platinum”, so you can see which platinums you can go for straight away.",
       "oculto": "Hidden on your profile",

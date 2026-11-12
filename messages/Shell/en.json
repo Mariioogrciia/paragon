@@ -336,6 +336,15 @@
       "retirarPregunta": "You haven't played anything on {consola} for {anios} years. Remove it from suggestions?",
       "retirarSi": "Remove it",
       "retirarNo": "No, I have it"
+    },
+    "cazas": {
+      "titulo": "Resume your hunts",
+      "sub": "The platinums you've chosen to go for.",
+      "vacio": "You haven't picked any hunts yet. Tap 🎯 on a game page or in “One step from platinum” and it'll show up here, ready to pick back up.",
+      "quitar": "Remove from my hunts",
+      "cazar": "Add to my hunts",
+      "enCazas": "In my hunts · remove",
+      "llena": "You already have {n} hunts: remove one above to add another."
     }
   },
   "Ejemplo": {

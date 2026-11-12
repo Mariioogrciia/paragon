@@ -66,12 +66,19 @@ object DatosDemo {
     private fun sesiones() = """{"sesiones":[${sesion(0)},${sesion(1)}],"juegos":[${juegos.filter { it.pct < 100 }.take(4).joinToString(",") { """{"id":"${it.id}","titulo":"${it.titulo}","platform":"${it.plat}","deviceLabel":"PS5","progreso":${it.pct}}""" }}]}"""
 
     /** «A un paso del platino» del panel (lib/platinables.ts): lo más cerca y lo que juegas ahora. */
+    /** «Reanuda tus cazas» (12 nov 2026): tres juegos elegidos para platinar. */
+    private fun cazasDemo(): String {
+        fun fila(j: J, dias: Int?, horas: Int?) =
+            """{"id":"${j.id}","title":"${j.titulo}","coverUrl":"${portada(j.app)}","percent":${j.pct},"faltan":${j.def - j.gan},"tienePlatino":${j.plat == "psn"},"sinEmpezar":${j.gan == 0},"diasDesdeJugado":${dias ?: "null"},"horasRestantes":${horas ?: "null"}}"""
+        return "[" + listOf(fila(juegos[6], 2, 3), fila(juegos[0], 0, 12), fila(juegos[3], 30, 21)).joinToString(",") + "]"
+    }
+
     private fun platinablesDemo(): String {
         fun fila(j: J, dias: Int?, horas: Int?, extra: String = "") =
             """{"id":"${j.id}","title":"${j.titulo}","coverUrl":"${portada(j.app)}","percent":${j.pct},"faltan":${j.def - j.gan},"tienePlatino":${j.plat == "psn"},"sinEmpezar":${j.gan == 0},"diasDesdeJugado":${dias ?: "null"},"horasRestantes":${horas ?: "null"},"dispositivos":["${if (j.plat == "psn") "PS5" else if (j.plat == "xbox") "XBOX SERIES" else "PC"}"]$extra}"""
         val cerca = listOf(
-            fila(juegos[6], 2, 3, ""","perdibles":1,"amigos":[{"nombre":"Nerea","percent":88}]"""),
-            fila(juegos[0], 0, 12, ""","masRaroPendiente":0.8,"instalado":true"""),
+            fila(juegos[6], 2, 3, ""","perdibles":1,"amigos":[{"nombre":"Nerea","percent":88}],"caza":true"""),
+            fila(juegos[0], 0, 12, ""","masRaroPendiente":0.8,"instalado":true,"caza":true"""),
             fila(juegos[2], 9, 8, ""","suscripcion":"ps_plus""""),
             fila(juegos[3], 30, 21),
             fila(juegos[8], 120, null),
@@ -127,6 +134,7 @@ object DatosDemo {
                 """{"nearPlatinum":[${juegos.filter { it.pct in 80..99 }.joinToString(",") { tarjeta(it) }}],"recent":[${juegos.take(5).joinToString(",") { tarjeta(it) }}],"nextTrophies":[""" +
                     trofeos.drop(1).take(4).mapIndexed { i, (n, g, r) -> """{"gameId":"psn-elden","gameTitle":"Elden Ring","trophyId":"t$i","trophyName":"$n","detail":"Derrota a un enemigo poderoso.","rarityPercent":$r,"gameProgress":92,"iconUrl":null,"grade":"$g"}""" }.joinToString(",") + "]," +
                     "\"platinables\":" + platinablesDemo() + "," +
+                    "\"cazas\":" + cazasDemo() + ",\"maxCazas\":8," +
                     "\"latestTrophies\":[" + trofeos.take(5).mapIndexed { i, (n, g, r) -> """{"gameId":"${juegos[i].id}","gameTitle":"${juegos[i].titulo}","gameIconUrl":"${portada(juegos[i].app)}","trophyId":"t$i","trophyName":"$n","iconUrl":null,"grade":"$g","earnedAt":"2026-10-0${5 - i}T20:00:00.000Z","rarityPercent":$r}""" }.joinToString(",") + "]}"
             ruta == "api/mobile/library" -> """{"games":[${juegos.mapIndexed { i, j -> biblioteca(j, i) }.joinToString(",")}]}"""
             ruta.startsWith("api/mobile/games/") && ruta.count { it == '/' } == 3 -> {

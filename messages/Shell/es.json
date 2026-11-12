@@ -336,6 +336,15 @@
       "retirarPregunta": "Hace {anios} años que no juegas a nada de {consola}. ¿La quitas de las sugerencias?",
       "retirarSi": "Quitarla",
       "retirarNo": "No, la tengo"
+    },
+    "cazas": {
+      "titulo": "Reanuda tus cazas",
+      "sub": "Los platinos que has elegido ir a por ellos.",
+      "vacio": "Aún no has elegido ninguna caza. Pulsa 🎯 en la ficha de un juego o en «A un paso del platino» y saldrá aquí, para retomarla de un toque.",
+      "quitar": "Quitar de mis cazas",
+      "cazar": "Añadir a mis cazas",
+      "enCazas": "En mis cazas · quitar",
+      "llena": "Ya tienes {n} cazas: quita alguna arriba para añadir otra."
     }
   },
   "Ejemplo": {

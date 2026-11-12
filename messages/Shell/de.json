@@ -336,6 +336,15 @@
       "retirarPregunta": "Seit {anios} Jahren hast du nichts auf {consola} gespielt. Aus den Vorschlägen entfernen?",
       "retirarSi": "Entfernen",
       "retirarNo": "Nein, hab sie noch"
+    },
+    "cazas": {
+      "titulo": "Setze deine Jagden fort",
+      "sub": "Die Platins, die du dir vorgenommen hast.",
+      "vacio": "Du hast noch keine Jagd gewählt. Tippe auf 🎯 auf einer Spielseite oder bei „Kurz vor Platin“, dann erscheint sie hier.",
+      "quitar": "Aus meinen Jagden entfernen",
+      "cazar": "Zu meinen Jagden",
+      "enCazas": "In meinen Jagden · entfernen",
+      "llena": "Du hast schon {n} Jagden: entferne oben eine, um eine weitere hinzuzufügen."
     }
   },
   "Ejemplo": {

@@ -192,6 +192,9 @@
     <string name="carpeta_vacio_sheet">Tu n\'as pas encore de dossier. Crées-en un ci-dessous.</string>
     <string name="carpeta_vacio_sub">Regroupe tes jeux comme tu veux — par saga, plateforme, n\'importe quoi — et crée des dossiers avec le + en haut.</string>
     <string name="carpetas_titulo">Dossiers</string>
+    <string name="caza_llena">Tu as déjà 8 chasses : retires-en une pour en ajouter une autre.</string>
+    <string name="cazas_titulo">Reprends tes chasses</string>
+    <string name="cazas_vacio">Tu n\'as encore choisi aucune chasse. Appuie sur 🎯 sur la fiche d\'un jeu ou dans « À un pas du platine ».</string>
     <string name="clan_abandonar">Quitter le clan</string>
     <string name="clan_abandonar_borra">Quitter le clan (le supprime)</string>
     <string name="clan_abandonar_propio">Quitter ton propre clan ?</string>
@@ -675,6 +678,9 @@
     <string name="main_cerrar_busqueda">Fermer la recherche</string>
     <string name="main_racha">Série de %1$s jours</string>
     <string name="main_sin_racha">Aucune série en cours</string>
+    <string name="marca_caza">À mes chasses</string>
+    <string name="marca_caza_activa">Dans mes chasses</string>
+    <string name="marca_caza_ayuda">Il apparaît tout en haut de l\'accueil, dans « Reprends tes chasses ».</string>
     <string name="marca_dos_semanas">Dans deux semaines</string>
     <string name="marca_fecha">Date objectif</string>
     <string name="marca_fecha_titulo">Pour quand le veux-tu ?</string>

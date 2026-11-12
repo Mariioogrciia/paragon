@@ -69,7 +69,7 @@ export async function GET(
     diario,
     // Tus marcas de este juego (8 nov 2026): instalado, oculto en tu perfil y la fecha objetivo del platino reservado.
     marcas: marcas
-      ? { instalado: marcas.instalados.has(detail.id), ocultoPerfil: marcas.ocultosPerfil.has(detail.id), fechaObjetivo: marcas.fechaObjetivo }
+      ? { instalado: marcas.instalados.has(detail.id), ocultoPerfil: marcas.ocultosPerfil.has(detail.id), fechaObjetivo: marcas.fechaObjetivo, caza: marcas.cazas.includes(detail.id) }
       : null,
     plan:
       plan && plan.faltan > 0

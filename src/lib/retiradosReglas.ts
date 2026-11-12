@@ -7,6 +7,7 @@
  * la Vita lo puedes seguir jugando ahí.
  */
 import type { Game } from "@/lib/types";
+import { esPlatinoEquivalente } from "@/lib/stats";
 
 export interface Retirados {
   dispositivos: Set<string>;
@@ -22,11 +23,28 @@ export interface Marcas extends Retirados {
   instalados: Set<string>;
   ocultosPerfil: Set<string>;
   fechaObjetivo: string | null;
+  /** «Mis cazas» (12 nov 2026): los juegos que quieres platinar, en el orden en que los elegiste. */
+  cazas: string[];
 }
 
-export type TipoMarca = "dispositivo" | "juego" | "instalado" | "oculto_perfil" | "fecha_objetivo";
+export type TipoMarca = "dispositivo" | "juego" | "instalado" | "oculto_perfil" | "fecha_objetivo" | "caza";
 
-export const SIN_RETIRADOS: Marcas = { dispositivos: new Set(), juegos: new Set(), instalados: new Set(), ocultosPerfil: new Set(), fechaObjetivo: null };
+export const SIN_RETIRADOS: Marcas = { dispositivos: new Set(), juegos: new Set(), instalados: new Set(), ocultosPerfil: new Set(), fechaObjetivo: null, cazas: [] };
+
+/** Cuántos juegos caben a la vez en «Mis cazas». */
+export const MAX_CAZAS = 8;
+
+/**
+ * «Reanuda tus cazas» (12 nov 2026): los juegos elegidos, en su orden, que
+ * sigan en tu biblioteca, no estén retirados y no estén ya platinados (o al
+ * 100 % donde no hay platino). Los platinados salen solos de la lista.
+ */
+export function cazasDeBiblioteca(games: Game[], marcas: Pick<Marcas, "cazas" | "dispositivos" | "juegos">): Game[] {
+  const porId = new Map(games.map((g) => [g.id, g]));
+  return marcas.cazas
+    .map((id) => porId.get(id))
+    .filter((g): g is Game => g !== undefined && !esPlatinoEquivalente(g) && !juegoRetirado(g, marcas));
+}
 
 const DIA_MS = 86_400_000;
 

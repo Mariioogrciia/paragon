@@ -35,6 +35,10 @@
     "allTrophiesHeading": "Tous les trophées",
     "trophiesEarnedOf": "{earned} sur {total} obtenus",
     "marcas": {
+      "caza": "À mes chasses",
+      "cazaActiva": "Dans mes chasses",
+      "cazaAyuda": "Il apparaît tout en haut de l'accueil, dans « Reprends tes chasses ».",
+      "cazaLlena": "Tu as déjà {n} chasses : retires-en une pour ajouter celle-ci.",
       "instalado": "Installé",
       "instaladoAyuda": "Installé en ce moment : il apparaît dans le filtre « Installés » de « À un pas du platine », pour voir quels platines tu peux aller chercher tout de suite.",
       "oculto": "Masqué sur ton profil",

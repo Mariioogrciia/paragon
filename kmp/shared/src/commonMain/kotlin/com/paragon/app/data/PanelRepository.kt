@@ -123,6 +123,8 @@ sealed class HighlightsResult {
         val nextTrophies: List<NextTrophy> = emptyList(),
         val latestTrophies: List<LatestTrophy> = emptyList(),
         val platinables: com.paragon.shared.red.PlatinablesDto = com.paragon.shared.red.PlatinablesDto(),
+        /** «Reanuda tus cazas» (12 nov 2026). */
+        val cazas: List<com.paragon.shared.red.PlatinableDto> = emptyList(),
     ) : HighlightsResult()
     data class Error(val message: String) : HighlightsResult()
 }
@@ -273,6 +275,7 @@ class PanelRepository(private val tokenStore: TokenStore? = null, private val pa
                 nextTrophies = response.nextTrophies.map { it.toNextTrophy() },
                 latestTrophies = response.latestTrophies.map { it.toLatestTrophy() },
                 platinables = response.platinables,
+                cazas = response.cazas,
             )
         } catch (e: HttpException) {
             HighlightsResult.Error(Textos.t(T.error_servidor, e.code()))

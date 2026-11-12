@@ -8990,5 +8990,53 @@
   "fr": "🙈 Invisible sur ton profil public, mais il compte toujours pour toi.",
   "it": "🙈 Non si vede nel tuo profilo pubblico, ma continua a contare per te.",
   "pt": "🙈 Não aparece no teu perfil público, mas continua a contar para ti."
+ },
+ "cazas_titulo": {
+  "de": "Setze deine Jagden fort",
+  "en": "Resume your hunts",
+  "es": "Reanuda tus cazas",
+  "fr": "Reprends tes chasses",
+  "it": "Riprendi le tue cacce",
+  "pt": "Retoma as tuas caçadas"
+ },
+ "cazas_vacio": {
+  "de": "Du hast noch keine Jagd gewählt. Tippe auf 🎯 auf einer Spielseite oder bei „Kurz vor Platin“.",
+  "en": "You haven't picked any hunts yet. Tap 🎯 on a game page or in “One step from platinum” and it'll show up here.",
+  "es": "Aún no has elegido ninguna caza. Pulsa 🎯 en la ficha de un juego o en «A un paso del platino» y saldrá aquí.",
+  "fr": "Tu n'as encore choisi aucune chasse. Appuie sur 🎯 sur la fiche d'un jeu ou dans « À un pas du platine ».",
+  "it": "Non hai ancora scelto nessuna caccia. Tocca 🎯 nella scheda di un gioco o in «A un passo dal platino».",
+  "pt": "Ainda não escolheste nenhuma caçada. Toca em 🎯 na ficha de um jogo ou em «A um passo da platina»."
+ },
+ "marca_caza": {
+  "de": "Zu meinen Jagden",
+  "en": "Add to my hunts",
+  "es": "A mis cazas",
+  "fr": "À mes chasses",
+  "it": "Alle mie cacce",
+  "pt": "Às minhas caçadas"
+ },
+ "marca_caza_activa": {
+  "de": "In meinen Jagden",
+  "en": "In my hunts",
+  "es": "En mis cazas",
+  "fr": "Dans mes chasses",
+  "it": "Nelle mie cacce",
+  "pt": "Nas minhas caçadas"
+ },
+ "marca_caza_ayuda": {
+  "de": "Erscheint ganz oben auf der Startseite unter „Setze deine Jagden fort“.",
+  "en": "It shows up at the top of your Home, in “Resume your hunts”.",
+  "es": "Sale arriba del todo en el Panel, en «Reanuda tus cazas».",
+  "fr": "Il apparaît tout en haut de l'accueil, dans « Reprends tes chasses ».",
+  "it": "Compare in cima alla home, in «Riprendi le tue cacce».",
+  "pt": "Aparece no topo do início, em «Retoma as tuas caçadas»."
+ },
+ "caza_llena": {
+  "de": "Du hast schon 8 Jagden: entferne eine, um eine weitere hinzuzufügen.",
+  "en": "You already have 8 hunts: remove one to add another.",
+  "es": "Ya tienes 8 cazas: quita alguna para añadir otra.",
+  "fr": "Tu as déjà 8 chasses : retires-en une pour en ajouter une autre.",
+  "it": "Hai già 8 cacce: togline una per aggiungerne un'altra.",
+  "pt": "Já tens 8 caçadas: tira uma para juntar outra."
  }
 }

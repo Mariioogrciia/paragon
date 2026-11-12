@@ -3,7 +3,7 @@ import { getLibrary, getProfileByUserId } from "@/lib/profiles";
 import { esPlatinoEquivalente } from "@/lib/stats";
 import { platinables, type Platinable } from "@/lib/platinables";
 import { getRetirados } from "@/lib/retirados";
-import { consolasParaRetirar, sinRetirados } from "@/lib/retiradosReglas";
+import { consolasParaRetirar, sinRetirados, MAX_CAZAS, cazasDeBiblioteca } from "@/lib/retiradosReglas";
 import { doblesPlatinos, extrasPlatinables, type ExtrasJuego } from "@/lib/platinablesExtras";
 import { getTrophyRecommendations } from "@/lib/recommendations";
 import { idiomaDeCabecera } from "@/lib/idiomasTrofeo";
@@ -89,8 +89,19 @@ export async function GET(req: Request) {
       perdibles: e?.perdibles ?? 0,
       masRaroPendiente: e?.masRaroPendiente ?? null,
       amigos: (e?.amigos ?? []).map((a) => ({ nombre: a.nombre ?? a.handle, percent: a.percent })),
+      caza: marcas.cazas.includes(p.game.id),
     };
   };
+  // «Reanuda tus cazas» (12 nov 2026): lo que has elegido platinar, en su orden.
+  const ahoraMs = Date.now();
+  const cazas = cazasDeBiblioteca(games, marcas).map((g) => ({
+    ...toCard(g),
+    faltan: Math.max(0, g.definedTotal - g.earnedTotal),
+    tienePlatino: (g.defined?.platinum ?? 0) > 0,
+    sinEmpezar: g.earnedTotal === 0,
+    diasDesdeJugado: g.lastPlayedAt ? Math.max(0, Math.floor((ahoraMs - new Date(g.lastPlayedAt).getTime()) / 86_400_000)) : null,
+    horasRestantes: g.hltb?.completionist ? Math.max(0, Math.round(g.hltb.completionist - (g.playtimeMinutes ?? 0) / 60)) : null,
+  }));
   const sugerencia = consolasParaRetirar(games, marcas)[0] ?? null;
 
   return jsonConEtag(req, {
@@ -103,6 +114,8 @@ export async function GET(req: Request) {
       // "Hace 3 años que no juegas a nada de PS3": la app pregunta si la quita de las sugerencias.
       sugerenciaRetirar: sugerencia,
     },
+    cazas,
+    maxCazas: MAX_CAZAS,
     recent: recent.map(toCard),
     nextTrophies: recomendaciones.map((r) => ({
       gameId: r.gameId,

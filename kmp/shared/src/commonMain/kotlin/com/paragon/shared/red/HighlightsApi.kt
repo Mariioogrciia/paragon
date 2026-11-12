@@ -61,6 +61,9 @@ data class HighlightsResponse(
     val latestTrophies: List<LatestTrophyDto> = emptyList(),
     /** Qué te puedes platinar (8 nov 2026, lib/platinables.ts): lo más cerca y lo que juegas ahora. */
     val platinables: PlatinablesDto = PlatinablesDto(),
+    /** «Reanuda tus cazas» (12 nov 2026): los juegos elegidos para platinar, en su orden. */
+    val cazas: List<PlatinableDto> = emptyList(),
+    val maxCazas: Int = 8,
 )
 
 @Serializable
@@ -84,6 +87,8 @@ data class PlatinableDto(
     val perdibles: Int = 0,
     val masRaroPendiente: Double? = null,
     val amigos: List<AmigoAMediasDto> = emptyList(),
+    /** Está en «Mis cazas» (12 nov 2026). */
+    val caza: Boolean = false,
 )
 
 @Serializable

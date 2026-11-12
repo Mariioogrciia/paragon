@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { dispositivosDe, dispositivosDeBiblioteca, juegoRetirado, sinRetirados } from "@/lib/retiradosReglas";
+import { cazasDeBiblioteca, dispositivosDe, dispositivosDeBiblioteca, juegoRetirado, sinRetirados } from "@/lib/retiradosReglas";
+import type { Game } from "@/lib/types";
 
 const r = (dispositivos: string[], juegos: string[] = []) => ({ dispositivos: new Set(dispositivos), juegos: new Set(juegos) });
 
@@ -31,5 +32,18 @@ describe("retirados", () => {
       { dispositivo: "PS3", juegos: 1 },
       { dispositivo: "PSVITA", juegos: 1 },
     ]);
+  });
+
+  it("«Mis cazas»: en el orden elegido, sin platinados, retirados ni juegos que ya no están", () => {
+    const juego = (id: string, o: Partial<Game> = {}) =>
+      ({ id, platform: "psn", title: id, deviceLabel: "PS5", definedTotal: 40, earnedTotal: 10, progressPercent: 25, defined: { platinum: 1, gold: 0, silver: 0, bronze: 39 }, earned: { platinum: 0, gold: 0, silver: 0, bronze: 10 }, ...o }) as Game;
+    const games = [
+      juego("a"),
+      juego("b"),
+      juego("plat", { earnedTotal: 40, progressPercent: 100, earned: { platinum: 1, gold: 0, silver: 0, bronze: 39 } }),
+      juego("viejo", { deviceLabel: "PS3" }),
+    ];
+    const marcas = { cazas: ["b", "plat", "no-existe", "viejo", "a"], dispositivos: new Set(["PS3"]), juegos: new Set<string>() };
+    expect(cazasDeBiblioteca(games, marcas).map((g) => g.id)).toEqual(["b", "a"]);
   });
 });

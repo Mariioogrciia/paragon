@@ -207,6 +207,14 @@ fun PanelScreen(
                     onPlatinos = { showConfetti = true },
                 )
                 val ok = highlights as? HighlightsResult.Ok
+                // «Reanuda tus cazas» (12 nov 2026): lo que has elegido platinar, lo primero.
+                if (ok != null) {
+                    SeccionCazas(
+                        cazas = ok.cazas,
+                        onAbrir = { id -> navController.navigate(Screen.GameDetail.routeFor(id)) },
+                        onQuitar = { id -> ambitoPanel.launch { cambiarCaza(tokenStore, id, false) } },
+                    )
+                }
                 val recientes = ok?.recent.orEmpty()
                 if (recientes.isNotEmpty()) {
                     TituloSeccion(Textos.t(T.inicio_sigue_jugando), Textos.t(T.inicio_ver_todo)) { onBiblioteca() }
@@ -305,6 +313,11 @@ fun PanelScreen(
                                     // Sin red: vuelve a salir en la próxima carga; no hay nada que avisar.
                                 }
                             }
+                        },
+                        onCaza = { id, activa ->
+                            val hecho = cambiarCaza(tokenStore, id, activa)
+                            if (hecho) highlights = repository.getHighlights()
+                            hecho
                         },
                         onRetirarConsola = { consola ->
                             ambitoPanel.launch {
@@ -518,3 +531,13 @@ fun RivalBanner(rival: CompareSide, me: CompareSide, onClick: () -> Unit) {
     }
 }
 
+/** Añadir o quitar un juego de «Mis cazas» (12 nov 2026). `false` si no se pudo (sin red, o ya hay el máximo). */
+private suspend fun cambiarCaza(tokenStore: com.paragon.app.data.auth.TokenStore, id: String, activa: Boolean): Boolean =
+    try {
+        com.paragon.app.data.network.ApiClient.retiradosApi(tokenStore)
+            .cambiar(com.paragon.shared.red.CambiarRetiradoRequest("caza", id, activa)).ok
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
+    } catch (_: Exception) {
+        false
+    }

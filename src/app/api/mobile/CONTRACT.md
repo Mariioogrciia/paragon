@@ -1194,3 +1194,11 @@ distancia…), tipo tracker. Aparte de la ficha para no retrasarla. Admite
 ```
 
 `texto` ya va formateado en el idioma de `Accept-Language`. Lista vacía = nada que enseñar (no es de Steam, el juego no guarda estadísticas o son privadas). Lógica en `src/lib/estadisticasJuego.ts`.
+
+### «Mis cazas» (12 nov 2026)
+
+Los juegos que la persona ha elegido platinar (marca `caza` de `retirado`, como mucho `maxCazas`).
+
+- `GET /api/mobile/panel/highlights` trae `cazas` (en el orden elegido, sin platinados ni retirados), con los campos de las tarjetas más `faltan`, `tienePlatino`, `sinEmpezar`, `diasDesdeJugado`, `horasRestantes`; `maxCazas`; y cada fila de `platinables.*` lleva `caza: Boolean`.
+- `GET /api/mobile/games/{gameId}` → `marcas.caza`.
+- `PUT /api/mobile/retirados` con `{ "tipo": "caza", "valor": "<gameId>", "retirado": true|false }` la añade o la quita; responde `ok: false` si ya hay `maxCazas`.

@@ -336,6 +336,15 @@
       "retirarPregunta": "Ça fait {anios} ans que tu n'as rien joué sur {consola}. La retirer des suggestions ?",
       "retirarSi": "La retirer",
       "retirarNo": "Non, je l'ai"
+    },
+    "cazas": {
+      "titulo": "Reprends tes chasses",
+      "sub": "Les platines que tu as choisi de viser.",
+      "vacio": "Tu n'as encore choisi aucune chasse. Appuie sur 🎯 sur la fiche d'un jeu ou dans « À un pas du platine » et elle apparaîtra ici.",
+      "quitar": "Retirer de mes chasses",
+      "cazar": "Ajouter à mes chasses",
+      "enCazas": "Dans mes chasses · retirer",
+      "llena": "Tu as déjà {n} chasses : retires-en une plus haut pour en ajouter une autre."
     }
   },
   "Ejemplo": {

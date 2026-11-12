@@ -42,12 +42,15 @@ export function PlatinablesPanel({
   sugerencia,
   textos,
   nombresConsola,
+  cazasIniciales = [],
 }: {
   listas: Record<Pestana, FilaPlatinable[]>;
   /** "Hace 3 años que no juegas a nada de PS3": se puede quitar de las sugerencias. */
   sugerencia: { dispositivo: string; texto: string } | null;
-  textos: Record<Pestana | `desc_${Pestana}` | `vacio_${Pestana}` | "verMas" | "verMenos" | "yaNoLoTengo" | "todas" | "corto" | "instalados" | "suscripcion" | "quitar" | "dejar", string>;
+  textos: Record<Pestana | `desc_${Pestana}` | `vacio_${Pestana}` | "verMas" | "verMenos" | "yaNoLoTengo" | "todas" | "corto" | "instalados" | "suscripcion" | "quitar" | "dejar" | "cazar" | "enCazas" | "cazaLlena", string>;
   nombresConsola: Record<string, string>;
+  /** Los que ya están en «Mis cazas» (12 nov 2026): su 🎯 sale encendido. */
+  cazasIniciales?: string[];
 }) {
   const pestanas = (["cerca", "jugando", "faciles", "dobles"] as const).filter((p) => p !== "dobles" || listas.dobles.length > 0);
   const [pestana, setPestana] = useState<Pestana>(listas.cerca.length > 0 ? "cerca" : "jugando");
@@ -56,6 +59,30 @@ export function PlatinablesPanel({
   const [filtro, setFiltro] = useState<"corto" | "instalados" | "suscripcion" | null>(null);
   const [quitados, setQuitados] = useState<Set<string>>(() => new Set());
   const [aviso, setAviso] = useState(sugerencia);
+  const [cazas, setCazas] = useState<Set<string>>(() => new Set(cazasIniciales));
+  const [cazaLlena, setCazaLlena] = useState(false);
+
+  const alternarCaza = (id: string) => {
+    const nueva = !cazas.has(id);
+    setCazaLlena(false);
+    setCazas((s) => {
+      const n = new Set(s);
+      if (nueva) n.add(id);
+      else n.delete(id);
+      return n;
+    });
+    empezar(async () => {
+      const { ok } = await cambiarRetiradoAction("caza", id, nueva);
+      if (!ok && nueva) {
+        setCazas((s) => {
+          const n = new Set(s);
+          n.delete(id);
+          return n;
+        });
+        setCazaLlena(true);
+      }
+    });
+  };
   const [, empezar] = useTransition();
 
   const retirar = (id: string) => {
@@ -142,6 +169,7 @@ export function PlatinablesPanel({
       )}
 
       <p className="mb-3 text-[0.8125rem] text-muted">{textos[`desc_${pestana}`]}</p>
+      {cazaLlena && <p className="mb-3 text-xs font-semibold text-[var(--danger)]">🎯 {textos.cazaLlena}</p>}
 
       {lista.length === 0 ? (
         <p className="rounded-[14px] border border-dashed border-border px-4 py-6 text-center text-sm text-muted">{textos[`vacio_${pestana}`]}</p>
@@ -149,6 +177,20 @@ export function PlatinablesPanel({
         <ul className="grid gap-2.5 sm:grid-cols-2">
           {visibles.map((j) => (
             <li key={j.id} className="group/fila relative">
+              {!j.sinOcultar && (
+                <button
+                  type="button"
+                  onClick={() => alternarCaza(j.id)}
+                  title={cazas.has(j.id) ? textos.enCazas : textos.cazar}
+                  aria-label={`${cazas.has(j.id) ? textos.enCazas : textos.cazar}: ${j.titulo}`}
+                  aria-pressed={cazas.has(j.id)}
+                  className={`absolute right-8 top-1.5 z-10 flex h-6 w-6 items-center justify-center rounded-full text-xs transition-opacity hover:bg-surface-2 ${
+                    cazas.has(j.id) ? "opacity-100" : "opacity-60 grayscale hover:opacity-100 hover:grayscale-0 sm:opacity-0 sm:group-hover/fila:opacity-100"
+                  }`}
+                >
+                  🎯
+                </button>
+              )}
               {!j.sinOcultar && (
                 <button
                   type="button"
@@ -179,7 +221,7 @@ export function PlatinablesPanel({
                   )}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate pr-5 text-sm font-bold group-hover:text-[var(--accent-text)]">{j.titulo}</span>
+                  <span className="block truncate pr-12 text-sm font-bold group-hover:text-[var(--accent-text)]">{j.titulo}</span>
                   <span className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted">
                     <span className="font-semibold text-platinum">{j.faltan}</span>
                     {j.extra.map((e) => (
