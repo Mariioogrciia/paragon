@@ -1,6 +1,6 @@
 import Link from "@/components/Enlace";
 import { metaPublica } from "@/lib/seo";
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { HuecoAnuncio } from "@/components/HuecoAnuncio";
 import { JsonLd } from "@/components/JsonLd";
 import { datosJuego } from "@/lib/datosEstructurados";
@@ -57,11 +57,14 @@ export async function metadatosFichaJuego({ params }: { params: Promise<{ id: st
   const game = await getGlobalGame(decodeURIComponent(id));
   if (!game) return { title: "Juego · Paragon" };
 
-  const titulo = `${game.hasPlatinum ? "Trofeos" : "Logros"} de ${game.title} · Paragon`;
+  // Lo que se busca de verdad (12 nov 2026): "trofeos de X", "platino X", "lista de logros X".
+  const titulo = game.hasPlatinum
+    ? `Trofeos de ${game.title}: lista, platino y dificultad · Paragon`
+    : `Logros de ${game.title}: lista completa y dificultad · Paragon`;
   const partes = [game.developer ?? game.publisher, (game.genres ?? []).slice(0, 2).join(", ")].filter(Boolean);
   const descripcion = game.hasPlatinum
-    ? `Trofeos, dificultad y progreso de la comunidad en ${game.title}${partes.length ? ` (${partes.join(" · ")})` : ""}.`
-    : `Logros, dificultad y progreso de la comunidad en ${game.title}${partes.length ? ` (${partes.join(" · ")})` : ""}.`;
+    ? `Todos los trofeos de ${game.title} con su rareza, lo difícil que es el platino y cuánto tarda la comunidad en sacarlo${partes.length ? ` (${partes.join(" · ")})` : ""}.`
+    : `Todos los logros de ${game.title} con su rareza, la dificultad del 100 % y el progreso de la comunidad${partes.length ? ` (${partes.join(" · ")})` : ""}.`;
 
   // Tarjeta social en dirección fija (api/og), la misma para la versión con
   // sesión y para la copia pública cacheada.
@@ -87,7 +90,8 @@ export async function FichaJuego({
 
   // Si hemos accedido con un ID legado (psn-...) pero tiene igdbId, redirigimos a la versión canónica unificada.
   if (!/^\d+$/.test(gameId) && game.igdbId) {
-    redirect(`/juego/${game.igdbId}`);
+    // 308 y no 307 (12 nov 2026): así Google junta las dos URLs en la buena.
+    permanentRedirect(`/juego/${game.igdbId}`);
   }
 
   const [stats, rating, dificultadComunidad, reviews, session, detalles, trophyBreakdown] = await Promise.all([

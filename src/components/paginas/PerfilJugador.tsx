@@ -407,6 +407,9 @@ export async function PerfilJugador({
           )}
         </div>
 
+        {/* El nombre de la carta va dentro de un enlace con aria-label: para
+            buscadores y lectores de pantalla, el título de verdad (12 nov 2026). */}
+        <h1 className="sr-only">{profile.displayName ? `${profile.displayName} (@${handle})` : `@${handle}`}</h1>
         <div className="relative z-10 mx-auto max-w-[1240px] px-7 pt-6">
           <BackButton fallbackHref="/" dark />
         </div>
