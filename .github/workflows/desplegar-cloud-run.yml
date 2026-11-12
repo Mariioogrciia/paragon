@@ -92,7 +92,7 @@ jobs:
             --memory 1Gi \
             --min-instances 0 \
             --max-instances 3 \
-            --concurrency 80 \
+            --concurrency 40 \
             --timeout 300 \
             --quiet
           rm -f "$RUNNER_TEMP/ejecutar.yaml" "$RUNNER_TEMP/compilar.env"

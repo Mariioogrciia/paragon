@@ -1,4 +1,5 @@
 import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import net from "node:net";
 import postgres from "postgres";
 import * as schema from "./schema";
 
@@ -33,10 +34,51 @@ type Db = PostgresJsDatabase<typeof schema>;
 const globalForDb = globalThis as unknown as {
   conn?: ReturnType<typeof postgres>;
   db?: Db;
+  ultimoUso?: number;
 };
 
+/**
+ * Cloud Run (11 nov 2026): sin peticiones, la instancia se queda CONGELADA
+ * (sin CPU), y los temporizadores de `idle_timeout` no corren. Mientras,
+ * Supabase o la red cierran esas conexiones por su lado, y al despertar la
+ * primera consulta salía por un socket muerto y esperaba para siempre: las
+ * fichas y los perfiles daban 504 a los 5 minutos y, con el pool lleno de
+ * zombis, también la portada. Si llevamos más que esto sin tocar la base,
+ * se estrena un pool nuevo y el viejo se cierra aparte.
+ */
+const PAUSA_MAX_MS = 30_000;
+
+/**
+ * Socket que se corta solo si pasa este tiempo sin un solo byte (11 nov
+ * 2026): una conexión muerta a nivel de red ya no deja una consulta
+ * esperando para siempre, falla y el pool abre otra. Más que
+ * `statement_timeout` (30 s), así una consulta lenta pero viva no se toca;
+ * las conexiones ociosas las cierra antes `idle_timeout` (20 s).
+ */
+const SOCKET_SIN_DATOS_MS = 45_000;
+
+function socketConTope(o: { host: string[]; port: number[] }): Promise<net.Socket> {
+  return new Promise((resolve, reject) => {
+    const s = net.connect(o.port[0], o.host[0]);
+    s.setTimeout(SOCKET_SIN_DATOS_MS, () => s.destroy(new Error("Postgres no responde (socket sin datos)")));
+    s.once("connect", () => resolve(s));
+    s.once("error", reject);
+  });
+}
+
 function connect(): Db {
-  if (globalForDb.db) return globalForDb.db;
+  const ahora = Date.now();
+  if (globalForDb.db && globalForDb.conn) {
+    const pausa = ahora - (globalForDb.ultimoUso ?? ahora);
+    globalForDb.ultimoUso = ahora;
+    if (pausa <= PAUSA_MAX_MS) return globalForDb.db;
+    const viejo = globalForDb.conn;
+    globalForDb.conn = undefined;
+    globalForDb.db = undefined;
+    // Las consultas en vuelo (no debería haber: estaba parado) tienen 5 s.
+    void viejo.end({ timeout: 5 }).catch(() => {});
+  }
+  globalForDb.ultimoUso = ahora;
 
   const url = process.env.DATABASE_URL;
   if (!url) {
@@ -60,7 +102,11 @@ function connect(): Db {
     globalForDb.conn ??
     postgres(url, {
       prepare: false,
-      max: Number(process.env.DB_POOL_MAX ?? 5),
+      // `socket` existe en postgres.js pero no en sus tipos.
+      ...({ socket: socketConTope } as object),
+      // En Cloud Run una instancia atiende muchas peticiones a la vez (no
+      // una por función como en Vercel): más conexiones por pool.
+      max: Number(process.env.DB_POOL_MAX ?? (process.env.K_SERVICE ? 10 : 5)),
       idle_timeout: 20,
       connect_timeout: 10,
       max_lifetime: 60 * 30,
