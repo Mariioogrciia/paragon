@@ -105,9 +105,22 @@ async function main() {
       console.log("OK:", tabla);
     }
     // Arreglo de datos (12 nov 2026), idempotente: porcentajes por encima de
-    // 100 que guardó Epic (un GTA V al 390 %). Donde ya hay logros guardados,
-    // el porcentaje de verdad, logro a logro; donde no, a 0 y pendiente de
-    // sincronizar, para que lo calcule la próxima pasada.
+    // 100 (un GTA V de PS4 al 390 %). PlayStation: por puntos de cada metal,
+    // como lo calcula Sony (lib/psn/progreso.ts). El resto, logro a logro con
+    // lo guardado; y si no hay nada, a 0 y pendiente de sincronizar.
+    const psn = await sql`
+      update "user_game" ug
+      set "progressPercent" = least(100, round(100.0 * (
+            coalesce((ug."earned"->>'platinum')::int, 0) * 180 + coalesce((ug."earned"->>'gold')::int, 0) * 90 +
+            coalesce((ug."earned"->>'silver')::int, 0) * 30 + coalesce((ug."earned"->>'bronze')::int, 0) * 15
+          ) / nullif(
+            coalesce((g."defined"->>'platinum')::int, 0) * 180 + coalesce((g."defined"->>'gold')::int, 0) * 90 +
+            coalesce((g."defined"->>'silver')::int, 0) * 30 + coalesce((g."defined"->>'bronze')::int, 0) * 15, 0))
+        )::int
+      from "game" g
+      where g."id" = ug."gameId" and g."platform" = 'psn' and ug."progressPercent" > 100
+        and coalesce((g."defined"->>'platinum')::int, 0) + coalesce((g."defined"->>'gold')::int, 0) +
+            coalesce((g."defined"->>'silver')::int, 0) + coalesce((g."defined"->>'bronze')::int, 0) > 0`;
     const conLogros = await sql`
       update "user_game" ug
       set "progressPercent" = l.pct, "earnedTotal" = l.ganados
@@ -122,7 +135,7 @@ async function main() {
     const sinLogros = await sql`
       update "user_game" set "progressPercent" = 0, "earnedTotal" = 0, "trophiesSyncedAt" = null
       where "progressPercent" > 100`;
-    console.log("Porcentajes de más de 100 rehechos:", conLogros.count, "con sus logros,", sinLogros.count, "pendientes de sincronizar");
+    console.log("Porcentajes de más de 100 rehechos:", psn.count, "de PSN por metales,", conLogros.count, "con sus logros,", sinLogros.count, "pendientes de sincronizar");
   } finally {
     await sql.end();
   }

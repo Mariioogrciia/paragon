@@ -11,6 +11,7 @@ import {
   type TrophyTitle,
   type TrophyCounts as PsnCounts,
 } from "psn-api";
+import { progresoPsn } from "@/lib/psn/progreso";
 import { getAuthorization } from "./auth";
 import {
   gameKey,
@@ -152,7 +153,8 @@ function toGame(title: TrophyTitle): Game {
     deviceLabel: title.trophyTitlePlatform,
     iconUrl: title.trophyTitleIconUrl,
     lastPlayedAt: title.lastUpdatedDateTime,
-    progressPercent: title.progress,
+    // El de Sony, salvo que sea imposible (un GTA V de PS4 llegó al 390 %).
+    progressPercent: progresoPsn(title.progress, defined, earned),
     definedTotal: totalCount(defined),
     earnedTotal: totalCount(earned),
     defined,
