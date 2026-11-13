@@ -3,6 +3,7 @@
 /* eslint-disable @next/next/no-img-element -- carátulas de CDNs externos (PSN, Steam...), como en el resto del panel */
 import { useMemo, useState, useTransition } from "react";
 import Link from "@/components/Enlace";
+import { Target } from "lucide-react";
 import { coverGradient } from "@/lib/design";
 import { cambiarRetiradoAction } from "@/app/actions/retirados";
 
@@ -184,11 +185,16 @@ export function PlatinablesPanel({
                   title={cazas.has(j.id) ? textos.enCazas : textos.cazar}
                   aria-label={`${cazas.has(j.id) ? textos.enCazas : textos.cazar}: ${j.titulo}`}
                   aria-pressed={cazas.has(j.id)}
-                  className={`absolute right-8 top-1.5 z-10 flex h-6 w-6 items-center justify-center rounded-full text-xs transition-opacity hover:bg-surface-2 ${
-                    cazas.has(j.id) ? "opacity-100" : "opacity-60 grayscale hover:opacity-100 hover:grayscale-0 sm:opacity-0 sm:group-hover/fila:opacity-100"
+                  // Icono de diana del mismo estilo que la × (13 nov 2026): el emoji
+                  // en gris quedaba raro en el móvil. Encendida, con el color de acento.
+                  className={`absolute right-8 top-1.5 z-10 flex h-6 w-6 items-center justify-center rounded-full transition-[opacity,background-color,color] ${
+                    cazas.has(j.id)
+                      ? "opacity-100"
+                      : "text-muted opacity-60 hover:bg-surface-2 hover:text-[var(--accent-text)] hover:opacity-100 sm:opacity-0 sm:group-hover/fila:opacity-100"
                   }`}
+                  style={cazas.has(j.id) ? { background: "rgb(var(--accent-rgb) / 0.16)", color: "var(--accent-text)" } : undefined}
                 >
-                  🎯
+                  <Target size={14} strokeWidth={2.4} aria-hidden="true" />
                 </button>
               )}
               {!j.sinOcultar && (
