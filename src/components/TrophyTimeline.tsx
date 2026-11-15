@@ -9,7 +9,7 @@ import { GRADES, type Trophy, type TrophyGrade } from "@/lib/types";
 const PLOT_HEIGHT_PX = 300;
 
 /** Alto de la fila de meses. */
-const MONTH_LABEL_HEIGHT_PX = 20;
+const MONTH_LABEL_HEIGHT_PX = 30;
 
 /** Margen a los cuatro lados del área de puntos — sin esto, un trofeo con
  * 0%/100% de rareza exacto, o del primer/último día, queda con el centro
@@ -96,7 +96,10 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
   // es la separación mínima entre dos etiquetas, en fracción del ancho
   // total — a este tamaño de letra, menos que esto ya se pisan.
   const GAP_MIN_ETIQUETA_FRAC = 0.06;
-  const etiquetasMes: { frac: number; texto: string }[] = [];
+  // Mes arriba y año completo debajo (15 nov 2026): "ene 16" se leía como
+  // un día. El año va resaltado en la primera etiqueta de cada año.
+  const etiquetasMes: { frac: number; mes: string; anio: string; anioNuevo: boolean }[] = [];
+  let anioAnterior = "";
   let mesAnterior = "";
   let fracUltimaEtiqueta = -Infinity;
   diasOrdenados.forEach((dia) => {
@@ -106,10 +109,14 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
     if (frac - fracUltimaEtiqueta < GAP_MIN_ETIQUETA_FRAC) return;
     mesAnterior = mesKey;
     fracUltimaEtiqueta = frac;
+    const anio = dia.slice(0, 4);
     etiquetasMes.push({
       frac,
-      texto: new Date(`${dia}T00:00:00Z`).toLocaleDateString(locale, { month: "short", year: "2-digit" }),
+      mes: new Date(`${dia}T00:00:00Z`).toLocaleDateString(locale, { month: "short", timeZone: "UTC" }).replace(".", ""),
+      anio,
+      anioNuevo: anio !== anioAnterior,
     });
+    anioAnterior = anio;
   });
 
   // Agregados por día: cuántos trofeos cayeron, su rareza media (posición Y
@@ -140,7 +147,7 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
         </div>
       )}
 
-      <div className="flex" style={{ height: PLOT_HEIGHT_PX + MONTH_LABEL_HEIGHT_PX }}>
+      <div className="flex" style={{ height: PLOT_HEIGHT_PX + 20 }}>
         <EjeY />
         <div className="relative min-w-0 flex-1 border-l" style={{ borderColor: "var(--border)", height: PLOT_HEIGHT_PX }}>
           {[0, 25, 50, 75, 100].map((r) => (
@@ -213,10 +220,12 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
         {etiquetasMes.map((e, i) => (
           <span
             key={i}
-            className="absolute top-1 text-[0.5625rem] text-muted"
-            style={{ left: `${e.frac * 100}%`, transform: "translateX(-50%)" }}
+            className="absolute top-1 flex flex-col items-center whitespace-nowrap text-[0.5625rem] leading-tight text-muted"
+            // En los bordes, alineada hacia dentro para que no se corte ni se parta.
+            style={{ left: `${e.frac * 100}%`, transform: e.frac > 0.95 ? "translateX(-85%)" : e.frac < 0.05 ? "translateX(-15%)" : "translateX(-50%)" }}
           >
-            {e.texto}
+            <span>{e.mes}</span>
+            <span className={e.anioNuevo ? "font-bold text-foreground" : "opacity-60"}>{e.anio}</span>
           </span>
         ))}
       </div>
