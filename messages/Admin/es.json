@@ -85,7 +85,9 @@
       "psnGuardar": "Guardar",
       "psnGuardando": "Probando con Sony…",
       "psnGuardadoOk": "Guardado: Sony lo acepta y PSN vuelve a sincronizar, sin redesplegar.",
-      "psnAyuda": "Con la sesión de PlayStation abierta (mejor en una ventana de incógnito que luego cierras sin cerrar sesión), abre"
+      "psnAyuda": "Con la sesión de PlayStation abierta (mejor en una ventana de incógnito que luego cierras sin cerrar sesión), abre",
+      "psnFormato": "Eso no parece un NPSSO: copia solo el valor de «npsso» (64 letras y números), sin espacios ni saltos de línea.",
+      "psnErrorGuardar": "Sony lo acepta, pero no se pudo guardar en la base (¿falta la migración del despliegue?). Hasta que se guarde, solo vale en este servidor."
     },
     "recentSyncs": {
       "title": "Sincronizaciones recientes",

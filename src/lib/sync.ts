@@ -224,6 +224,12 @@ async function mapLimit<T>(items: T[], limit: number, run: (item: T) => Promise<
 
 /* ------------------------------- Biblioteca ------------------------------- */
 
+/**
+ * Juego de PSN con los trofeos ya contados de su lista DESPUÉS de lo último
+ * que cambió en Sony: lo contado vale más que el resumen de la biblioteca.
+ */
+const psnYaContado = sql`(${userGames.trophiesSyncedAt} is not null and excluded."lastPlayedAt" is not null and excluded."lastPlayedAt" <= ${userGames.trophiesSyncedAt})`;
+
 async function saveLibrary(userId: string, library: Game[]): Promise<void> {
   for (const batch of chunked(library)) {
     await db
@@ -289,8 +295,12 @@ async function saveLibrary(userId: string, library: Game[]): Promise<void> {
           // DLC con trofeos nuevos. El «solo sube» es para las demás, que
           // juntan varias cuentas o mandan 0 hasta tener el detalle.
           progressPercent: sql`case when ${userGames.gameId} like 'psn-%' then least(100, excluded."progressPercent") else least(100, greatest(${userGames.progressPercent}, excluded."progressPercent")) end`,
-          earnedTotal: sql`case when ${userGames.gameId} like 'psn-%' then excluded."earnedTotal" else greatest(${userGames.earnedTotal}, excluded."earnedTotal") end`,
-          earned: sql`coalesce(excluded."earned", ${userGames.earned})`,
+          // Y si ya se contaron los trofeos con la lista del juego y Sony no
+          // ha movido nada desde entonces (su `lastUpdatedDateTime` no es
+          // posterior), manda lo contado: si no, cada pasada de la
+          // biblioteca volvía a poner el resumen malo encima (16 nov 2026).
+          earnedTotal: sql`case when ${userGames.gameId} like 'psn-%' then (case when ${psnYaContado} then ${userGames.earnedTotal} else excluded."earnedTotal" end) else greatest(${userGames.earnedTotal}, excluded."earnedTotal") end`,
+          earned: sql`case when ${userGames.gameId} like 'psn-%' and ${psnYaContado} then ${userGames.earned} else coalesce(excluded."earned", ${userGames.earned}) end`,
           // `greatest` (ignora los null) en vez de quedarse con lo último: con
           // dos cuentas de Steam que tienen el mismo juego (ver
           // lib/steamExtra.ts), cada sincronización pisaba a la otra y las

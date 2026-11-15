@@ -85,7 +85,9 @@
       "psnGuardar": "Save",
       "psnGuardando": "Checking with Sony…",
       "psnGuardadoOk": "Saved: Sony accepts it and PSN syncs again, no redeploy needed.",
-      "psnAyuda": "Signed in to PlayStation (ideally in a private window you then close without signing out), open"
+      "psnAyuda": "Signed in to PlayStation (ideally in a private window you then close without signing out), open",
+      "psnFormato": "Isso não parece um NPSSO: copia só o valor de «npsso» (64 letras e números), sem espaços nem quebras de linha.",
+      "psnErrorGuardar": "A Sony aceita-o, mas não foi possível guardá-lo na base de dados (falta a migração do deploy?). Até ser guardado, só vale neste servidor."
     },
     "recentSyncs": {
       "title": "Recent syncs",

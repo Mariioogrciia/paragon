@@ -130,10 +130,6 @@ export async function npssoPrincipal(): Promise<string | null> {
   return (await npssoGuardado()) ?? npssoDelEntorno();
 }
 
-export async function isPsnConfigured(): Promise<boolean> {
-  return (await npssoPrincipal()) !== null;
-}
-
 /** Olvida el token en caché: para comprobar un NPSSO recién puesto sin esperar a que caduque el anterior. */
 export function olvidarTokenPsn(): void {
   cache = null;
@@ -210,6 +206,11 @@ export async function getAuthorization(): Promise<AuthorizationPayload> {
     try {
       cache = await authenticateWithNpsso(npsso);
       npssoEnUso = i;
+      npssoActivo = npsso;
+      // El de Admin rechazado y otro funcionando (16 nov 2026): el de Admin
+      // está muerto. Se borra para que el principal vuelva a ser el de las
+      // variables y Admin no siga enseñando el muerto como el bueno.
+      if (guardado && npsso !== guardado) await olvidarNpssoGuardado();
       return { accessToken: cache.accessToken };
     } catch (error) {
       if (!(error instanceof PsnAuthError)) throw error;
@@ -217,6 +218,33 @@ export async function getAuthorization(): Promise<AuthorizationPayload> {
     }
   }
   throw ultimoError;
+}
+
+async function olvidarNpssoGuardado(): Promise<void> {
+  try {
+    const { guardarNpsso } = await import("@/lib/psn/npssoGuardado");
+    await guardarNpsso(null);
+  } catch (error) {
+    console.error("[psn] no se pudo borrar el NPSSO caducado de Admin", error);
+  }
+}
+
+/** El NPSSO con el que se sacó el token en uso (el principal o uno de respaldo); `null` si aún ninguno. */
+let npssoActivo: string | null = null;
+
+export function npssoQueFunciona(): string | null {
+  return npssoActivo;
+}
+
+/**
+ * Autentica con un NPSSO concreto y lo deja como el del token en caché
+ * (16 nov 2026): al pegar uno nuevo en Admin, esa misma comprobación ya
+ * deja el token listo, sin una segunda vuelta a Sony.
+ */
+export async function autenticarConNpssoNuevo(npsso: string): Promise<void> {
+  cache = await authenticateWithNpsso(npsso);
+  npssoActivo = npsso;
+  npssoEnUso = 0;
 }
 
 /**

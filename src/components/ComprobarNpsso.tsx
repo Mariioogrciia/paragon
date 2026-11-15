@@ -28,13 +28,14 @@ export function ComprobarNpsso({
   const comprobar = () => {
     setAccion("comprobar");
     setGuardado(false);
-    empezar(async () => setResultado(await comprobarNpssoAction()));
+    empezar(async () => setResultado(await comprobarNpssoAction().catch(() => ({ resultado: "sin-respuesta" as const, detalle: null }))));
   };
   const guardar = () => {
     if (!nuevo.trim()) return;
     setAccion("guardar");
     empezar(async () => {
-      const r = await guardarNpssoAction(nuevo);
+      // Si el servidor falla del todo, mejor un aviso que tirar la página entera.
+      const r = await guardarNpssoAction(nuevo).catch(() => ({ resultado: "error-guardar" as const, detalle: null }));
       setResultado(r);
       setGuardado(r?.resultado === "ok");
       if (r?.resultado === "ok") setNuevo("");

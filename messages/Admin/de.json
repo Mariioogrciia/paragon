@@ -85,7 +85,9 @@
       "psnGuardar": "Speichern",
       "psnGuardando": "Wird bei Sony geprüft…",
       "psnGuardadoOk": "Gespeichert: Sony akzeptiert ihn und PSN synchronisiert wieder, ohne neues Deployment.",
-      "psnAyuda": "Bei PlayStation angemeldet (am besten in einem privaten Fenster, das du danach schließt, ohne dich abzumelden), öffne"
+      "psnAyuda": "Bei PlayStation angemeldet (am besten in einem privaten Fenster, das du danach schließt, ohne dich abzumelden), öffne",
+      "psnFormato": "Das sieht nicht nach einem NPSSO aus: kopiere nur den Wert von „npsso“ (64 Buchstaben und Ziffern), ohne Leerzeichen oder Zeilenumbrüche.",
+      "psnErrorGuardar": "Sony akzeptiert ihn, aber er konnte nicht in der Datenbank gespeichert werden (fehlt die Migration beim Deployment?). Bis er gespeichert ist, gilt er nur auf diesem Server."
     },
     "recentSyncs": {
       "title": "Letzte Synchronisierungen",

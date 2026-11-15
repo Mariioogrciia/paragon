@@ -85,7 +85,9 @@
       "psnGuardar": "Enregistrer",
       "psnGuardando": "Vérification auprès de Sony…",
       "psnGuardadoOk": "Enregistré : Sony l'accepte et PSN se synchronise à nouveau, sans redéployer.",
-      "psnAyuda": "Connecté à PlayStation (idéalement dans une fenêtre privée que tu fermes ensuite sans te déconnecter), ouvre"
+      "psnAyuda": "Connecté à PlayStation (idéalement dans une fenêtre privée que tu fermes ensuite sans te déconnecter), ouvre",
+      "psnFormato": "Ça ne ressemble pas à un NPSSO : copie seulement la valeur de « npsso » (64 lettres et chiffres), sans espaces ni retours à la ligne.",
+      "psnErrorGuardar": "Sony l'accepte, mais il n'a pas pu être enregistré dans la base (la migration du déploiement manque ?). Tant qu'il n'est pas enregistré, il ne vaut que sur ce serveur."
     },
     "recentSyncs": {
       "title": "Synchronisations récentes",

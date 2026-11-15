@@ -645,6 +645,8 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                         guardando: t("system.infrastructure.psnGuardando"),
                         guardadoOk: t("system.infrastructure.psnGuardadoOk"),
                         ayuda: t("system.infrastructure.psnAyuda"),
+                        formato: t("system.infrastructure.psnFormato"),
+                        "error-guardar": t("system.infrastructure.psnErrorGuardar"),
                       }}
                     />
                   </div>

@@ -6,7 +6,7 @@ import { notificationLog } from "@/db/schema";
 import { avisarUsuario } from "@/lib/avisos";
 import { avisoNpsso, diasRestantesNpsso, type AvisoNpsso } from "@/lib/caducidadNpsso";
 import { idDesarrollador } from "@/lib/avisoDesarrollador";
-import { codigoDesdeNpsso, getAuthorization, npssoDelEntorno, npssoPrincipal, olvidarTokenPsn, PsnAuthError } from "@/lib/psn/auth";
+import { autenticarConNpssoNuevo, getAuthorization, npssoDelEntorno, npssoPrincipal, npssoQueFunciona, olvidarTokenPsn, PsnAuthError } from "@/lib/psn/auth";
 import { guardarNpsso } from "@/lib/psn/npssoGuardado";
 
 /**
@@ -34,6 +34,17 @@ const RUTA_ADMIN = "/admin?tab=system";
 
 function huellaDe(npsso: string): string {
   return createHash("sha256").update(npsso).digest("hex").slice(0, 12);
+}
+
+/** ¿El token en uso salió del NPSSO principal? (Si no hay token aún, se da por bueno.) */
+function funcionaElPrincipal(huellaPrincipal: string | null): boolean {
+  const activo = npssoQueFunciona();
+  return !activo || !huellaPrincipal || huellaDe(activo) === huellaPrincipal;
+}
+
+/** "NPSSO de 64 caracteres, huella abc…": para Admin, sin enseñar nunca el NPSSO. */
+function describirNpsso(npsso: string): string {
+  return `NPSSO de ${npsso.length} caracteres${/^[A-Za-z0-9]{64}$/.test(npsso) ? "" : " (uno válido tiene 64 letras y números)"}, huella ${huellaDe(npsso)}`;
 }
 
 /** Huella del NPSSO principal (el de Admin o `PSN_NPSSO`). */
@@ -97,8 +108,7 @@ export async function revisarCredencialPsn(ahora = new Date()): Promise<AvisoNps
   const desarrollador = await idDesarrollador();
   if (!desarrollador) return null;
 
-  const huella = await huellaNpsso();
-  const configurado = huella !== null;
+  const configurado = (await npssoPrincipal()) !== null;
   let falla = false;
   if (configurado) {
     try {
@@ -109,6 +119,11 @@ export async function revisarCredencialPsn(ahora = new Date()): Promise<AvisoNps
       falla = true;
     }
   }
+  // Después de autenticar (16 nov 2026): si el de Admin estaba muerto, ya se
+  // ha borrado y el principal es otro. Y si funciona uno de respaldo, el
+  // principal NO está bien: antes se apuntaba como "ok" el que no era.
+  const huella = await huellaNpsso();
+  if (!falla && !funcionaElPrincipal(huella)) falla = true;
 
   if (configurado && huella) await apuntarUltimo(desarrollador, huella, falla ? "fallo" : "ok");
 
@@ -154,32 +169,36 @@ export async function estadoCredencialPsn(userId: string, ahora = new Date()): P
  * lo apunta como visto (así el estado pasa a verde enseguida).
  */
 export type ResultadoComprobacion = {
-  resultado: "ok" | "falta" | "caducado" | "sin-respuesta";
+  resultado: "ok" | "falta" | "caducado" | "sin-respuesta" | "formato" | "error-guardar";
   /** Para el desarrollador: forma del NPSSO puesto y lo que dijo Sony (nunca el NPSSO). */
   detalle: string | null;
 };
 
 export async function comprobarCredencialPsnAhora(userId: string): Promise<ResultadoComprobacion> {
-  const npsso = await npssoPrincipal();
-  if (!npsso) return { resultado: "falta", detalle: null };
-  const huella = huellaDe(npsso);
-  // Uno bueno son 64 letras y números: otra cosa es que se pegó mal.
-  const forma = `NPSSO de ${npsso.length} caracteres${/^[A-Za-z0-9]{64}$/.test(npsso) ? "" : " (uno válido tiene 64 letras y números)"}, huella ${huella}`;
+  if (!(await npssoPrincipal())) return { resultado: "falta", detalle: null };
   olvidarTokenPsn();
   try {
     await getAuthorization();
   } catch (error) {
+    const npsso = await npssoPrincipal();
+    const forma = npsso ? describirNpsso(npsso) : "";
     if (!(error instanceof PsnAuthError)) {
       return { resultado: "sin-respuesta", detalle: `${forma} · ${error instanceof Error ? error.message : String(error)}` };
     }
-    if (huella) await apuntarUltimo(userId, huella, "fallo");
+    if (npsso) await apuntarUltimo(userId, huellaDe(npsso), "fallo");
     return { resultado: "caducado", detalle: `${forma} · Sony: ${error.detalle ?? error.message}` };
   }
-  if (huella) {
-    await db.insert(notificationLog).values({ userId, tipo: TIPO_VISTO, clave: huella }).onConflictDoNothing();
-    await apuntarUltimo(userId, huella, "ok");
+  // Releído después: si el de Admin estaba muerto, ya se ha borrado.
+  const npsso = await npssoPrincipal();
+  if (!npsso) return { resultado: "falta", detalle: null };
+  const huella = huellaDe(npsso);
+  if (!funcionaElPrincipal(huella)) {
+    await apuntarUltimo(userId, huella, "fallo");
+    return { resultado: "caducado", detalle: `${describirNpsso(npsso)} · Sony lo rechaza; PSN va con uno de respaldo` };
   }
-  return { resultado: "ok", detalle: forma };
+  await db.insert(notificationLog).values({ userId, tipo: TIPO_VISTO, clave: huella }).onConflictDoNothing();
+  await apuntarUltimo(userId, huella, "ok");
+  return { resultado: "ok", detalle: describirNpsso(npsso) };
 }
 
 /**
@@ -190,19 +209,27 @@ export async function comprobarCredencialPsnAhora(userId: string): Promise<Resul
  */
 export async function guardarNpssoNuevo(userId: string, pegado: string): Promise<ResultadoComprobacion> {
   const npsso = npssoDelEntorno(pegado);
-  if (!npsso) return { resultado: "falta", detalle: null };
+  // Solo letras y números: un salto de línea o un espacio dentro rompían la
+  // cabecera de la petición y salía «PSN no responde» (16 nov 2026).
+  if (!npsso || !/^[A-Za-z0-9]+$/.test(npsso)) return { resultado: "formato", detalle: null };
   const huella = huellaDe(npsso);
-  const forma = `NPSSO de ${npsso.length} caracteres${/^[A-Za-z0-9]{64}$/.test(npsso) ? "" : " (uno válido tiene 64 letras y números)"}, huella ${huella}`;
+  const forma = describirNpsso(npsso);
   try {
-    await codigoDesdeNpsso(npsso);
+    // Prueba y, si vale, deja ya el token en caché: una sola vuelta a Sony.
+    await autenticarConNpssoNuevo(npsso);
   } catch (error) {
     if (!(error instanceof PsnAuthError)) {
       return { resultado: "sin-respuesta", detalle: `${forma} · ${error instanceof Error ? error.message : String(error)}` };
     }
     return { resultado: "caducado", detalle: `${forma} · Sony: ${error.detalle ?? error.message}` };
   }
-  await guardarNpsso(npsso);
-  olvidarTokenPsn();
+  try {
+    await guardarNpsso(npsso);
+  } catch (error) {
+    // Lo más probable: falta la tabla (la crea la migración del despliegue).
+    console.error("[credencialPsn] guardar NPSSO", error);
+    return { resultado: "error-guardar", detalle: `${forma} · ${error instanceof Error ? error.message : String(error)}` };
+  }
   await db.insert(notificationLog).values({ userId, tipo: TIPO_VISTO, clave: huella }).onConflictDoNothing();
   await apuntarUltimo(userId, huella, "ok");
   return { resultado: "ok", detalle: forma };
