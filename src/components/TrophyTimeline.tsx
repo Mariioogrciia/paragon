@@ -347,7 +347,7 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
                 return (
                   <div
                     key={dia}
-                    className="absolute -translate-y-1/2 cursor-pointer"
+                    className="absolute cursor-pointer"
                     style={{
                       left: xPos(frac),
                       top: yPx(rarezaMedia),
