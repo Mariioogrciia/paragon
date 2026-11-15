@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useLocale, useTranslations } from "next-intl";
 import { colorFor } from "@/lib/design";
 import { GRADES, type Trophy, type TrophyGrade } from "@/lib/types";
@@ -105,25 +106,60 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
 
   // Ctrl + rueda (y el pellizco del trackpad, que llega así): zoom donde está
   // el ratón. Con listener propio porque React registra la rueda como pasiva
-  // y no deja cancelar el zoom de la página. Se vuelve a poner en cada
-  // render, así siempre ve el zoom actual.
+  // y no deja cancelar el zoom de la página. Se pone una sola vez, con el
+  // ref de la caja (React 19 limpia con lo que devuelve), y lee el zoom de
+  // un ref. El pellizco manda decenas de eventos pequeños: se acumulan y se
+  // sube o baja un nivel cada ~50 px de rueda, no uno por evento.
+  const zoomActual = useRef(zoom);
   useEffect(() => {
-    const el = scroller.current;
+    zoomActual.current = zoom;
+  }, [zoom]);
+  const ponerScroller = useCallback((el: HTMLDivElement | null) => {
+    scroller.current = el;
     if (!el) return;
+    let acumulado = 0;
+    let ultimo = 0;
     const rueda = (e: WheelEvent) => {
       if (!e.ctrlKey && !e.metaKey) return;
       e.preventDefault();
-      const actual = zoom;
+      if (e.timeStamp - ultimo > 400) acumulado = 0;
+      ultimo = e.timeStamp;
+      acumulado += e.deltaMode === 1 ? e.deltaY * 40 : e.deltaY;
+      if (Math.abs(acumulado) < 50) return;
+      const actual = zoomActual.current;
       const i = ZOOMS.indexOf(actual);
-      const siguiente = e.deltaY < 0 ? ZOOMS[Math.min(ZOOMS.length - 1, i + 1)] : ZOOMS[Math.max(0, i - 1)];
+      const siguiente = acumulado < 0 ? ZOOMS[Math.min(ZOOMS.length - 1, i + 1)] : ZOOMS[Math.max(0, i - 1)];
+      acumulado = 0;
       if (siguiente === actual) return;
       const x = e.clientX - el.getBoundingClientRect().left;
       ancla.current = { frac: (el.scrollLeft + x) / el.scrollWidth, x };
+      zoomActual.current = siguiente;
       setZoom(siguiente);
     };
     el.addEventListener("wheel", rueda, { passive: false });
     return () => el.removeEventListener("wheel", rueda);
-  });
+  }, []);
+
+  // La tarjeta de un trofeo suelto (16 nov 2026): fuera de la caja con
+  // scroll, en el body y con posición fija, para que no la corten ni los
+  // bordes ni el scroll; dentro de la pantalla siempre.
+  const [tarjeta, setTarjeta] = useState<{ dia: string; x: number; y: number; arriba: boolean } | null>(null);
+  const abrirTarjeta = (dia: string, el: HTMLElement) => {
+    const r = el.getBoundingClientRect();
+    const arriba = r.top > 100;
+    const x = Math.min(window.innerWidth - 8 - 96, Math.max(8 + 96, r.left + r.width / 2));
+    setTarjeta({ dia, x, y: arriba ? r.top - 8 : r.bottom + 8, arriba });
+  };
+  useEffect(() => {
+    if (!tarjeta) return;
+    const cerrar = () => setTarjeta(null);
+    window.addEventListener("scroll", cerrar, true);
+    window.addEventListener("resize", cerrar);
+    return () => {
+      window.removeEventListener("scroll", cerrar, true);
+      window.removeEventListener("resize", cerrar);
+    };
+  }, [tarjeta]);
 
   const puntos = trophies
     .filter((t): t is Trophy & { earnedAt: string; rarityPercent: number } => t.earned && !!t.earnedAt && t.rarityPercent != null)
@@ -292,7 +328,7 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
       <div className="flex">
         <EjeY marcas={marcasY} locale={locale} />
         <div
-          ref={scroller}
+          ref={ponerScroller}
           className={`min-w-0 flex-1 overflow-y-hidden border-l ${zoom > 1 ? "cursor-grab overflow-x-auto active:cursor-grabbing" : "overflow-x-hidden"}`}
           style={{ borderColor: "var(--border)" }}
           // Arrastrar con el ratón para recorrerla con zoom (en el móvil ya se
@@ -309,16 +345,21 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
             const a = arrastre.current;
             if (!a) return;
             const dx = e.clientX - a.x;
-            if (Math.abs(dx) > 3) a.movido = true;
+            if (!a.movido && Math.abs(dx) > 3) {
+              a.movido = true;
+              // Que el arrastre siga aunque el ratón salga de la caja o pase por una burbuja.
+              e.currentTarget.setPointerCapture(e.pointerId);
+            }
             if (a.movido) e.currentTarget.scrollLeft = a.scroll - dx;
           }}
+          onDragStart={(e) => e.preventDefault()}
           onPointerUp={() => {
             const a = arrastre.current;
             // Se deja un momento para que el clic de después vea que fue un arrastre.
             if (a?.movido) setTimeout(() => (arrastre.current = null), 0);
             else arrastre.current = null;
           }}
-          onPointerLeave={() => (arrastre.current = null)}
+          onPointerCancel={() => (arrastre.current = null)}
           onClickCapture={(e) => {
             if (arrastre.current?.movido) {
               e.stopPropagation();
@@ -355,9 +396,19 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
                       zIndex: isHover ? 20 : 1,
                       transition: "transform 120ms ease",
                     }}
-                    onMouseEnter={() => setHoverId(dia)}
-                    onMouseLeave={() => setHoverId((id) => (id === dia ? null : id))}
-                    onClick={() => (single ? setHoverId(dia) : setPopupDia(dia))}
+                    onMouseEnter={(e) => {
+                      setHoverId(dia);
+                      if (single && !arrastre.current?.movido) abrirTarjeta(dia, e.currentTarget);
+                    }}
+                    onMouseLeave={() => {
+                      setHoverId((id) => (id === dia ? null : id));
+                      setTarjeta((tj) => (tj?.dia === dia ? null : tj));
+                    }}
+                    onClick={(e) => {
+                      if (!single) return setPopupDia(dia);
+                      setHoverId(dia);
+                      abrirTarjeta(dia, e.currentTarget);
+                    }}
                   >
                     <div
                       className="flex items-center justify-center overflow-hidden rounded-full border-2 bg-surface-2 font-bold"
@@ -372,7 +423,7 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
                       {single ? (
                         single.iconUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img loading="lazy" decoding="async" src={single.iconUrl} alt="" className="h-full w-full object-cover" />
+                          <img loading="lazy" decoding="async" draggable={false} src={single.iconUrl} alt="" className="h-full w-full object-cover" />
                         ) : (
                           <span style={{ color: colorFor(single.grade) }}>{single.grade ? GRADE_LABEL[single.grade][0] : "?"}</span>
                         )
@@ -381,23 +432,6 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
                       )}
                     </div>
 
-                    {isHover && single && (
-                      <div
-                        className={`absolute left-1/2 w-48 -translate-x-1/2 rounded-lg p-2.5 text-center shadow-lg ${
-                          // Arriba del todo no cabe encima (el área con scroll la cortaría): debajo.
-                          yPx(rarezaMedia) < 80 ? "top-full mt-2" : "bottom-full mb-2"
-                        }`}
-                        style={{
-                          background: "var(--surface)",
-                          border: "1px solid var(--border)",
-                        }}
-                      >
-                        <p className="text-xs font-bold">{single.name}</p>
-                        <p className="mt-0.5 text-[0.6875rem] text-muted">
-                          {formatFecha(single.fechaMillis, locale)} · {single.rarityPercent.toFixed(1)}%
-                        </p>
-                      </div>
-                    )}
                   </div>
                 );
               })}
@@ -418,6 +452,32 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
           </div>
         </div>
       </div>
+
+      {tarjeta &&
+        typeof document !== "undefined" &&
+        (() => {
+          const p = porDia.get(tarjeta.dia)?.[0];
+          if (!p) return null;
+          return createPortal(
+            <div
+              role="tooltip"
+              className="pointer-events-none fixed z-50 w-48 rounded-lg p-2.5 text-center shadow-lg"
+              style={{
+                left: tarjeta.x,
+                top: tarjeta.y,
+                transform: `translate(-50%, ${tarjeta.arriba ? "-100%" : "0"})`,
+                background: "var(--surface)",
+                border: "1px solid var(--border)",
+              }}
+            >
+              <p className="text-xs font-bold">{p.name}</p>
+              <p className="mt-0.5 text-[0.6875rem] text-muted">
+                {formatFecha(p.fechaMillis, locale)} · {p.rarityPercent.toFixed(1)}%
+              </p>
+            </div>,
+            document.body,
+          );
+        })()}
 
       {grupoPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setPopupDia(null)}>
