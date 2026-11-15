@@ -244,7 +244,12 @@
     "bronce": "Bronze",
     "minimoDatos": "You need at least two trophies with a recorded date and rarity to draw the chart.",
     "popupTitulo": "{fecha} · {count, plural, one {# trophy} other {# trophies}}",
-    "cerrar": "Close"
+    "cerrar": "Close",
+    "ajustar": "Fit height",
+    "ajustarAyuda": "Stretches the height up to the most common trophy, to see the spread better when almost everything is rare",
+    "acercar": "Zoom in",
+    "alejar": "Zoom out",
+    "zoomAyuda": "Time zoom: click to go back to 1×. Also with Ctrl + wheel; when zoomed, drag to move around"
   },
   "trophyHistory": {
     "sinFechas": "There are no trophies with a recorded date yet. Dates arrive once each game's detail is synced, and that finishes filling in on its own in the background.",

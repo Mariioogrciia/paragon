@@ -244,7 +244,12 @@
     "bronce": "Bronze",
     "minimoDatos": "Il faut au moins deux trophées avec une date et une rareté enregistrées pour tracer le graphique.",
     "popupTitulo": "{fecha} · {count, plural, one {# trophée} other {# trophées}}",
-    "cerrar": "Fermer"
+    "cerrar": "Fermer",
+    "ajustar": "Ajuster la hauteur",
+    "ajustarAyuda": "Étire la hauteur jusqu'au trophée le plus courant, pour mieux voir la répartition quand presque tout est rare",
+    "acercar": "Zoomer",
+    "alejar": "Dézoomer",
+    "zoomAyuda": "Zoom du temps : clique pour revenir à 1×. Aussi avec Ctrl + molette ; zoomé, fais glisser pour te déplacer"
   },
   "trophyHistory": {
     "sinFechas": "Il n'y a encore aucun trophée avec une date enregistrée. Les dates arrivent lors de la synchronisation du détail de chaque jeu, et cela se complète tout seul en arrière-plan.",

@@ -244,7 +244,12 @@
     "bronce": "Bronze",
     "minimoDatos": "Es werden mindestens zwei Trophäen mit erfasstem Datum und Seltenheit benötigt, um die Grafik zu zeichnen.",
     "popupTitulo": "{fecha} · {count, plural, one {# Trophäe} other {# Trophäen}}",
-    "cerrar": "Schließen"
+    "cerrar": "Schließen",
+    "ajustar": "Höhe anpassen",
+    "ajustarAyuda": "Streckt die Höhe bis zur häufigsten Trophäe, damit die Verteilung besser sichtbar ist, wenn fast alles selten ist",
+    "acercar": "Vergrößern",
+    "alejar": "Verkleinern",
+    "zoomAyuda": "Zeit-Zoom: klicken, um zu 1× zurückzukehren. Auch mit Strg + Mausrad; mit Zoom zum Verschieben ziehen"
   },
   "trophyHistory": {
     "sinFechas": "Es gibt noch keine Trophäe mit erfasstem Datum. Daten kommen hinzu, sobald die Spieldetails synchronisiert werden, und das füllt sich im Hintergrund von selbst weiter.",

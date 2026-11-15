@@ -244,7 +244,12 @@
     "bronce": "Bronce",
     "minimoDatos": "Hacen falta al menos dos trofeos con fecha y rareza registradas para dibujar la gráfica.",
     "popupTitulo": "{fecha} · {count, plural, one {# trofeo} other {# trofeos}}",
-    "cerrar": "Cerrar"
+    "cerrar": "Cerrar",
+    "ajustar": "Ajustar altura",
+    "ajustarAyuda": "Estira la altura hasta el trofeo más común, para ver mejor el reparto cuando casi todo es raro",
+    "acercar": "Acercar",
+    "alejar": "Alejar",
+    "zoomAyuda": "Zoom del tiempo: pulsa para volver a 1×. También con Ctrl + rueda; con zoom, arrastra para moverte"
   },
   "trophyHistory": {
     "sinFechas": "Todavía no hay ningún trofeo con fecha registrada. Las fechas llegan al sincronizar el detalle de cada juego, y eso se va completando solo en segundo plano.",

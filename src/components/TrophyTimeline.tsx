@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { colorFor } from "@/lib/design";
 import { GRADES, type Trophy, type TrophyGrade } from "@/lib/types";
@@ -14,10 +14,28 @@ const MONTH_LABEL_HEIGHT_PX = 30;
 /** Margen a los cuatro lados del área de puntos — sin esto, un trofeo con
  * 0%/100% de rareza exacto, o del primer/último día, queda con el centro
  * justo en el borde. */
-const MARKER_PADDING_PX = 16;
+const MARKER_PADDING_PX = 24;
+
+/** Niveles de zoom del eje del tiempo (15 nov 2026): el ancho de la gráfica, en veces el visible. */
+const ZOOMS = [1, 2, 4, 8, 16];
+
+/** Techos posibles con «Ajustar altura»: sus cuartos son números redondos (80 → 20, 40, 60, 80). */
+const TECHOS = [4, 8, 12, 20, 40, 60, 80, 100];
+
+/** Hueco a cada lado dentro del área con scroll, para que las burbujas de los bordes no se corten. */
+const MARGEN_X_PX = 22;
+
+/** "25%", "12,5%"… */
+function porcentaje(v: number, locale: string): string {
+  return `${new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(v)}%`;
+}
 
 function formatFecha(millis: number, locale: string): string {
-  return new Date(millis).toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" });
+  return new Date(millis).toLocaleDateString(locale, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 /**
@@ -30,7 +48,10 @@ function formatFecha(millis: number, locale: string): string {
  * sin significar nada.
  *
  * Un marcador por DÍA (no por trofeo), repartido en el ancho real
- * disponible — nunca hay scroll, ni horizontal ni vertical. El eje X usa
+ * disponible. Zoom (15 nov 2026): con + y − (o Ctrl + rueda) el eje del
+ * tiempo se estira y se recorre con scroll o arrastrando; y «Ajustar altura»
+ * estira el eje de la rareza hasta el trofeo más común, para que no se
+ * amontone todo arriba cuando casi todo es raro. El eje X usa
  * raíz cuadrada del tiempo transcurrido desde el primer trofeo (no el
  * índice del día ni el tiempo lineal): así SÍ se aprecia qué días están
  * cerca y cuáles lejos en el tiempo real (antes cada día se llevaba un
@@ -45,9 +66,64 @@ function formatFecha(millis: number, locale: string): string {
 export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
   const t = useTranslations("Analitica.trophyTimeline");
   const locale = useLocale();
-  const GRADE_LABEL: Record<TrophyGrade, string> = { platinum: t("platino"), gold: t("oro"), silver: t("plata"), bronze: t("bronce") };
+  const GRADE_LABEL: Record<TrophyGrade, string> = {
+    platinum: t("platino"),
+    gold: t("oro"),
+    silver: t("plata"),
+    bronze: t("bronce"),
+  };
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [popupDia, setPopupDia] = useState<string | null>(null);
+  const [zoom, setZoom] = useState(1);
+  const [ajustada, setAjustada] = useState(true);
+  const scroller = useRef<HTMLDivElement>(null);
+  // Para que el zoom no te mueva de sitio: qué fracción del ancho había bajo
+  // el punto de referencia (el centro, o el ratón con Ctrl + rueda).
+  const ancla = useRef<{ frac: number; x: number } | null>(null);
+  const arrastre = useRef<{
+    x: number;
+    scroll: number;
+    movido: boolean;
+  } | null>(null);
+
+  const cambiarZoom = (nuevo: number, xEnVista?: number) => {
+    const el = scroller.current;
+    const z = Math.min(ZOOMS[ZOOMS.length - 1], Math.max(1, nuevo));
+    if (el && z !== zoom) {
+      const x = xEnVista ?? el.clientWidth / 2;
+      ancla.current = { frac: (el.scrollLeft + x) / el.scrollWidth, x };
+    }
+    setZoom(z);
+  };
+
+  useEffect(() => {
+    const el = scroller.current;
+    if (!el || !ancla.current) return;
+    el.scrollLeft = ancla.current.frac * el.scrollWidth - ancla.current.x;
+    ancla.current = null;
+  }, [zoom]);
+
+  // Ctrl + rueda (y el pellizco del trackpad, que llega así): zoom donde está
+  // el ratón. Con listener propio porque React registra la rueda como pasiva
+  // y no deja cancelar el zoom de la página. Se vuelve a poner en cada
+  // render, así siempre ve el zoom actual.
+  useEffect(() => {
+    const el = scroller.current;
+    if (!el) return;
+    const rueda = (e: WheelEvent) => {
+      if (!e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      const actual = zoom;
+      const i = ZOOMS.indexOf(actual);
+      const siguiente = e.deltaY < 0 ? ZOOMS[Math.min(ZOOMS.length - 1, i + 1)] : ZOOMS[Math.max(0, i - 1)];
+      if (siguiente === actual) return;
+      const x = e.clientX - el.getBoundingClientRect().left;
+      ancla.current = { frac: (el.scrollLeft + x) / el.scrollWidth, x };
+      setZoom(siguiente);
+    };
+    el.addEventListener("wheel", rueda, { passive: false });
+    return () => el.removeEventListener("wheel", rueda);
+  });
 
   const puntos = trophies
     .filter((t): t is Trophy & { earnedAt: string; rarityPercent: number } => t.earned && !!t.earnedAt && t.rarityPercent != null)
@@ -55,11 +131,7 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
     .sort((a, b) => a.fechaMillis - b.fechaMillis);
 
   if (puntos.length < 2) {
-    return (
-      <p className="py-8 text-center text-sm text-muted">
-        {t("minimoDatos")}
-      </p>
-    );
+    return <p className="py-8 text-center text-sm text-muted">{t("minimoDatos")}</p>;
   }
 
   const porDia = new Map<string, typeof puntos>();
@@ -98,7 +170,12 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
   const GAP_MIN_ETIQUETA_FRAC = 0.06;
   // Mes arriba y año completo debajo (15 nov 2026): "ene 16" se leía como
   // un día. El año va resaltado en la primera etiqueta de cada año.
-  const etiquetasMes: { frac: number; mes: string; anio: string; anioNuevo: boolean }[] = [];
+  const etiquetasMes: {
+    frac: number;
+    mes: string;
+    anio: string;
+    anioNuevo: boolean;
+  }[] = [];
   let anioAnterior = "";
   let mesAnterior = "";
   let fracUltimaEtiqueta = -Infinity;
@@ -106,7 +183,7 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
     const mesKey = dia.slice(0, 7);
     if (mesKey === mesAnterior) return;
     const frac = fracPorDia.get(dia) ?? 0;
-    if (frac - fracUltimaEtiqueta < GAP_MIN_ETIQUETA_FRAC) return;
+    if (frac - fracUltimaEtiqueta < GAP_MIN_ETIQUETA_FRAC / zoom) return;
     mesAnterior = mesKey;
     fracUltimaEtiqueta = frac;
     const anio = dia.slice(0, 4);
@@ -126,123 +203,238 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
     const grupo = porDia.get(dia)!;
     const rarezaMedia = grupo.reduce((sum, p) => sum + p.rarityPercent, 0) / grupo.length;
     const gradoDominante = GRADES.find((g) => grupo.some((p) => p.grade === g)) ?? grupo[0].grade;
-    return { dia, grupo, rarezaMedia, gradoDominante, frac: fracPorDia.get(dia) ?? 0 };
+    return {
+      dia,
+      grupo,
+      rarezaMedia,
+      gradoDominante,
+      frac: fracPorDia.get(dia) ?? 0,
+    };
   });
 
   const gradosPresentes = GRADES.filter((g) => puntos.some((p) => p.grade === g));
-  const yPx = (rarity: number) => MARKER_PADDING_PX + (rarity / 100) * (PLOT_HEIGHT_PX - 2 * MARKER_PADDING_PX);
+  // Altura ajustada: el eje llega hasta el trofeo más común (redondeado a
+  // un techo con cuartos redondos: 20, 40, 60, 80…), no siempre hasta 100%.
+  const rarezaMax = Math.max(...puntos.map((p) => p.rarityPercent));
+  const techo = !ajustada ? 100 : (TECHOS.find((t) => t >= rarezaMax) ?? 100);
+  const marcasY = [0, 0.25, 0.5, 0.75, 1].map((f) => f * techo);
+  const yPx = (rarity: number) => MARKER_PADDING_PX + (Math.min(rarity, techo) / techo) * (PLOT_HEIGHT_PX - 2 * MARKER_PADDING_PX);
+  const xPos = (frac: number) => `calc(${MARGEN_X_PX}px + ${frac} * (100% - ${2 * MARGEN_X_PX}px))`;
+  const iZoom = ZOOMS.indexOf(zoom);
 
   const grupoPopup = popupDia ? porDia.get(popupDia) : null;
 
   return (
     <div>
-      {gradosPresentes.length > 1 && (
-        <div className="mb-4 flex flex-wrap gap-3">
-          {gradosPresentes.map((g) => (
+      <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2">
+        {gradosPresentes.length > 1 &&
+          gradosPresentes.map((g) => (
             <div key={g} className="flex items-center gap-1.5 text-[0.6875rem] font-semibold text-muted">
               <span className="h-2.5 w-2.5 rounded-full" style={{ background: colorFor(g) }} />
               {GRADE_LABEL[g]}
             </div>
           ))}
-        </div>
-      )}
-
-      <div className="flex" style={{ height: PLOT_HEIGHT_PX + 20 }}>
-        <EjeY />
-        <div className="relative min-w-0 flex-1 border-l" style={{ borderColor: "var(--border)", height: PLOT_HEIGHT_PX }}>
-          {[0, 25, 50, 75, 100].map((r) => (
-            <div
-              key={r}
-              className="absolute left-0 right-0 h-px"
-              style={{ top: yPx(r), background: "var(--border)", opacity: 0.4 }}
-            />
-          ))}
-
-          {resumenPorDia.map(({ dia, grupo, rarezaMedia, gradoDominante, frac }) => {
-            const size = grupo.length === 1 ? 32 : Math.min(24 + grupo.length * 3, 44);
-            const single = grupo.length === 1 ? grupo[0] : null;
-            const isHover = hoverId === dia;
-            return (
-              <div
-                key={dia}
-                className="absolute -translate-y-1/2 cursor-pointer"
-                style={{
-                  left: `${frac * 100}%`,
-                  top: yPx(rarezaMedia),
-                  transform: `translate(-50%, -50%) scale(${isHover ? 1.15 : 1})`,
-                  zIndex: isHover ? 20 : 1,
-                  transition: "transform 120ms ease",
-                }}
-                onMouseEnter={() => setHoverId(dia)}
-                onMouseLeave={() => setHoverId((id) => (id === dia ? null : id))}
-                onClick={() => (single ? setHoverId(dia) : setPopupDia(dia))}
-              >
-                <div
-                  className="flex items-center justify-center overflow-hidden rounded-full border-2 bg-surface-2 font-bold"
-                  style={{
-                    width: size,
-                    height: size,
-                    borderColor: colorFor(gradoDominante),
-                    fontSize: size < 32 ? "0.6875rem" : undefined,
-                    color: "var(--foreground)",
-                  }}
-                >
-                  {single ? (
-                    single.iconUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img loading="lazy" decoding="async" src={single.iconUrl} alt="" className="h-full w-full object-cover" />
-                    ) : (
-                      <span style={{ color: colorFor(single.grade) }}>{single.grade ? GRADE_LABEL[single.grade][0] : "?"}</span>
-                    )
-                  ) : (
-                    grupo.length
-                  )}
-                </div>
-
-                {isHover && single && (
-                  <div
-                    className="absolute bottom-full left-1/2 mb-2 w-48 -translate-x-1/2 rounded-lg p-2.5 text-center shadow-lg"
-                    style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-                  >
-                    <p className="text-xs font-bold">{single.name}</p>
-                    <p className="mt-0.5 text-[0.6875rem] text-muted">
-                      {formatFecha(single.fechaMillis, locale)} · {single.rarityPercent.toFixed(1)}%
-                    </p>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+        <div className="ml-auto flex items-center gap-1.5">
+          <button
+            type="button"
+            aria-pressed={ajustada}
+            onClick={() => setAjustada((a) => !a)}
+            title={t("ajustarAyuda")}
+            className="rounded-full border px-2.5 py-1 text-[0.6875rem] font-bold transition-colors"
+            style={
+              ajustada
+                ? {
+                    background: "rgb(var(--accent-rgb) / 0.16)",
+                    color: "var(--accent-text)",
+                    borderColor: "rgb(var(--accent-rgb) / 0.4)",
+                  }
+                : { color: "var(--muted)", borderColor: "var(--border)" }
+            }
+          >
+            ↕ {t("ajustar")}
+          </button>
+          <div className="flex items-center rounded-full border" style={{ borderColor: "var(--border)" }}>
+            <button
+              type="button"
+              onClick={() => cambiarZoom(ZOOMS[Math.max(0, iZoom - 1)])}
+              disabled={iZoom === 0}
+              aria-label={t("alejar")}
+              title={t("alejar")}
+              className="flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold text-muted transition-colors hover:text-foreground disabled:opacity-35"
+            >
+              −
+            </button>
+            <button
+              type="button"
+              onClick={() => cambiarZoom(1)}
+              title={t("zoomAyuda")}
+              className="min-w-[2.25rem] text-center text-[0.6875rem] font-bold tabular-nums"
+              style={{
+                color: zoom > 1 ? "var(--accent-text)" : "var(--muted)",
+              }}
+            >
+              {zoom}×
+            </button>
+            <button
+              type="button"
+              onClick={() => cambiarZoom(ZOOMS[Math.min(ZOOMS.length - 1, iZoom + 1)])}
+              disabled={iZoom === ZOOMS.length - 1}
+              aria-label={t("acercar")}
+              title={t("acercar")}
+              className="flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold text-muted transition-colors hover:text-foreground disabled:opacity-35"
+            >
+              +
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="relative ml-[34px]" style={{ height: MONTH_LABEL_HEIGHT_PX }}>
-        {etiquetasMes.map((e, i) => (
-          <span
-            key={i}
-            className="absolute top-1 flex flex-col items-center whitespace-nowrap text-[0.5625rem] leading-tight text-muted"
-            // En los bordes, alineada hacia dentro para que no se corte ni se parta.
-            style={{ left: `${e.frac * 100}%`, transform: e.frac > 0.95 ? "translateX(-85%)" : e.frac < 0.05 ? "translateX(-15%)" : "translateX(-50%)" }}
-          >
-            <span>{e.mes}</span>
-            <span className={e.anioNuevo ? "font-bold text-foreground" : "opacity-60"}>{e.anio}</span>
-          </span>
-        ))}
+      <div className="flex">
+        <EjeY marcas={marcasY} locale={locale} />
+        <div
+          ref={scroller}
+          className={`min-w-0 flex-1 overflow-y-hidden border-l ${zoom > 1 ? "cursor-grab overflow-x-auto active:cursor-grabbing" : "overflow-x-hidden"}`}
+          style={{ borderColor: "var(--border)" }}
+          // Arrastrar con el ratón para recorrerla con zoom (en el móvil ya se
+          // desliza con el dedo). Un arrastre no cuenta como clic en una burbuja.
+          onPointerDown={(e) => {
+            if (e.pointerType !== "mouse" || e.button !== 0 || zoom === 1) return;
+            arrastre.current = {
+              x: e.clientX,
+              scroll: e.currentTarget.scrollLeft,
+              movido: false,
+            };
+          }}
+          onPointerMove={(e) => {
+            const a = arrastre.current;
+            if (!a) return;
+            const dx = e.clientX - a.x;
+            if (Math.abs(dx) > 3) a.movido = true;
+            if (a.movido) e.currentTarget.scrollLeft = a.scroll - dx;
+          }}
+          onPointerUp={() => {
+            const a = arrastre.current;
+            // Se deja un momento para que el clic de después vea que fue un arrastre.
+            if (a?.movido) setTimeout(() => (arrastre.current = null), 0);
+            else arrastre.current = null;
+          }}
+          onPointerLeave={() => (arrastre.current = null)}
+          onClickCapture={(e) => {
+            if (arrastre.current?.movido) {
+              e.stopPropagation();
+              arrastre.current = null;
+            }
+          }}
+        >
+          <div className="relative select-none" style={{ width: `${zoom * 100}%` }}>
+            <div className="relative" style={{ height: PLOT_HEIGHT_PX }}>
+              {marcasY.map((r) => (
+                <div
+                  key={r}
+                  className="absolute left-0 right-0 h-px"
+                  style={{
+                    top: yPx(r),
+                    background: "var(--border)",
+                    opacity: 0.4,
+                  }}
+                />
+              ))}
+
+              {resumenPorDia.map(({ dia, grupo, rarezaMedia, gradoDominante, frac }) => {
+                const size = grupo.length === 1 ? 32 : Math.min(24 + grupo.length * 3, 44);
+                const single = grupo.length === 1 ? grupo[0] : null;
+                const isHover = hoverId === dia;
+                return (
+                  <div
+                    key={dia}
+                    className="absolute -translate-y-1/2 cursor-pointer"
+                    style={{
+                      left: xPos(frac),
+                      top: yPx(rarezaMedia),
+                      transform: `translate(-50%, -50%) scale(${isHover ? 1.15 : 1})`,
+                      zIndex: isHover ? 20 : 1,
+                      transition: "transform 120ms ease",
+                    }}
+                    onMouseEnter={() => setHoverId(dia)}
+                    onMouseLeave={() => setHoverId((id) => (id === dia ? null : id))}
+                    onClick={() => (single ? setHoverId(dia) : setPopupDia(dia))}
+                  >
+                    <div
+                      className="flex items-center justify-center overflow-hidden rounded-full border-2 bg-surface-2 font-bold"
+                      style={{
+                        width: size,
+                        height: size,
+                        borderColor: colorFor(gradoDominante),
+                        fontSize: size < 32 ? "0.6875rem" : undefined,
+                        color: "var(--foreground)",
+                      }}
+                    >
+                      {single ? (
+                        single.iconUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img loading="lazy" decoding="async" src={single.iconUrl} alt="" className="h-full w-full object-cover" />
+                        ) : (
+                          <span style={{ color: colorFor(single.grade) }}>{single.grade ? GRADE_LABEL[single.grade][0] : "?"}</span>
+                        )
+                      ) : (
+                        grupo.length
+                      )}
+                    </div>
+
+                    {isHover && single && (
+                      <div
+                        className={`absolute left-1/2 w-48 -translate-x-1/2 rounded-lg p-2.5 text-center shadow-lg ${
+                          // Arriba del todo no cabe encima (el área con scroll la cortaría): debajo.
+                          yPx(rarezaMedia) < 80 ? "top-full mt-2" : "bottom-full mb-2"
+                        }`}
+                        style={{
+                          background: "var(--surface)",
+                          border: "1px solid var(--border)",
+                        }}
+                      >
+                        <p className="text-xs font-bold">{single.name}</p>
+                        <p className="mt-0.5 text-[0.6875rem] text-muted">
+                          {formatFecha(single.fechaMillis, locale)} · {single.rarityPercent.toFixed(1)}%
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="relative mt-3" style={{ height: MONTH_LABEL_HEIGHT_PX }}>
+              {etiquetasMes.map((e, i) => (
+                <span
+                  key={i}
+                  className="absolute top-1 flex -translate-x-1/2 flex-col items-center whitespace-nowrap text-[0.5625rem] leading-tight text-muted"
+                  style={{ left: xPos(e.frac) }}
+                >
+                  <span>{e.mes}</span>
+                  <span className={e.anioNuevo ? "font-bold text-foreground" : "opacity-60"}>{e.anio}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       {grupoPopup && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-          onClick={() => setPopupDia(null)}
-        >
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setPopupDia(null)}>
           <div
             className="max-h-[80vh] w-full max-w-sm overflow-y-auto rounded-2xl p-4"
-            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+            style={{
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-3 flex items-center justify-between">
               <p className="text-sm font-bold">
-                {t("popupTitulo", { fecha: formatFecha(grupoPopup[0].fechaMillis, locale), count: grupoPopup.length })}
+                {t("popupTitulo", {
+                  fecha: formatFecha(grupoPopup[0].fechaMillis, locale),
+                  count: grupoPopup.length,
+                })}
               </p>
               <button
                 type="button"
@@ -282,18 +474,21 @@ export function TrophyTimeline({ trophies }: { trophies: Trophy[] }) {
   );
 }
 
-/** Columna de "0%"..."100%" del eje Y, fija a la izquierda. */
-function EjeY() {
+/** Columna de porcentajes del eje Y, fija a la izquierda (no se mueve con el zoom). */
+function EjeY({ marcas, locale }: { marcas: number[]; locale: string }) {
   return (
     <div
       className="flex shrink-0 flex-col justify-between pr-2 text-right text-[0.625rem] text-muted"
-      style={{ width: 34, height: PLOT_HEIGHT_PX, paddingTop: MARKER_PADDING_PX, paddingBottom: MARKER_PADDING_PX }}
+      style={{
+        width: 38,
+        height: PLOT_HEIGHT_PX,
+        paddingTop: MARKER_PADDING_PX - 6,
+        paddingBottom: MARKER_PADDING_PX - 6,
+      }}
     >
-      <span>0%</span>
-      <span>25%</span>
-      <span>50%</span>
-      <span>75%</span>
-      <span>100%</span>
+      {marcas.map((m) => (
+        <span key={m}>{porcentaje(m, locale)}</span>
+      ))}
     </div>
   );
 }
