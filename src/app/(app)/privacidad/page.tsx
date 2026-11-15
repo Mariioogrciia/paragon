@@ -62,6 +62,7 @@ export default async function PrivacidadPage() {
           <li>{t.rich("s2li4", richTags)}</li>
           <li>{t.rich("s2li5", richTags)}</li>
           <li>{t.rich("s2li6", richTags)}</li>
+          <li>{t.rich("s2li7", richTags)}</li>
         </ul>
       </Seccion>
 
@@ -96,6 +97,7 @@ export default async function PrivacidadPage() {
           <li>{t.rich("s4liSteam", richTags)}</li>
           <li>{t.rich("s4li4", richTags)}</li>
           <li>{t.rich("s4li5", richTags)}</li>
+          <li>{t.rich("s4liExtras", richTags)}</li>
           {anunciosActivos() && <li>{t.rich("s4liAnuncios", richTags)}</li>}
           {editorAdMob() && <li>{t.rich("s4liAdMob", richTags)}</li>}
         </ul>

@@ -93,20 +93,6 @@ export default async function CookiesPage() {
 
       <section className="space-y-3 text-sm leading-relaxed text-foreground/90">
         <h2 className="text-lg font-bold text-foreground">{t("s4t")}</h2>
-        <p className="text-muted">
-          {t.rich("s4", {
-            vercelLink: (chunks) => (
-              <a
-                href="https://vercel.com/docs/analytics/privacy-policy"
-                target="_blank"
-                rel="noopener noreferrer nofollow"
-                className="text-accent hover:underline"
-              >
-                {chunks}
-              </a>
-            ),
-          })}
-        </p>
         <p className="text-muted">{t("s4propia")}</p>
       </section>
 
