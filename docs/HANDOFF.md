@@ -794,7 +794,7 @@ Variables de entorno (ver `.env.example`):
 |---|---|
 | `DATABASE_URL` / `DIRECT_URL` | Supabase. La segunda, solo para DDL. |
 | `AUTH_SECRET`, `AUTH_GOOGLE_*`, `AUTH_DISCORD_*` | Auth.js. |
-| `PSN_NPSSO` | **Caduca cada ~2 meses.** Cuando caduque, deja de sincronizar todo PSN. Desde el 16 oct el cron avisa al desarrollador (push + DM de Discord) una semana antes y en cuanto falla; estado en Admin → Sistema (`lib/credencialPsn.ts`). |
+| `PSN_NPSSO` | **Caduca cada ~2 meses.** Cuando caduque, deja de sincronizar todo PSN. Desde el 16 oct el cron avisa al desarrollador (push + DM de Discord) una semana antes y en cuanto falla; estado en Admin → Sistema (`lib/credencialPsn.ts`). Desde el 15 nov se renueva **pegándolo en Admin → Sistema**: se prueba con Sony, se guarda cifrado en `credencial_servidor` y manda sobre `PSN_NPSSO`, sin redesplegar. |
 | `STEAM_API_KEY` | No caduca. |
 | `IGDB_CLIENT_ID` / `IGDB_CLIENT_SECRET` | Twitch dev. |
 | `CRON_SECRET` | Puesta y funcionando (16 oct: el workflow "Sincronización frecuente" recibe HTTP 200). Sin ella la ruta del cron devuelve 503 a propósito. El mismo valor va en el secreto `CRON_SECRET` del repo, con `SITE_URL`. |

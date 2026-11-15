@@ -6,7 +6,8 @@ import { notificationLog } from "@/db/schema";
 import { avisarUsuario } from "@/lib/avisos";
 import { avisoNpsso, diasRestantesNpsso, type AvisoNpsso } from "@/lib/caducidadNpsso";
 import { idDesarrollador } from "@/lib/avisoDesarrollador";
-import { getAuthorization, isPsnConfigured, npssoDelEntorno, olvidarTokenPsn, PsnAuthError } from "@/lib/psn/auth";
+import { codigoDesdeNpsso, getAuthorization, npssoDelEntorno, npssoPrincipal, olvidarTokenPsn, PsnAuthError } from "@/lib/psn/auth";
+import { guardarNpsso } from "@/lib/psn/npssoGuardado";
 
 /**
  * Aviso al desarrollador cuando el NPSSO del servidor (`PSN_NPSSO`) falla o
@@ -31,9 +32,14 @@ const TIPO_AVISO = "psn-npsso";
 const TIPO_ULTIMO = "psn-npsso-ultimo";
 const RUTA_ADMIN = "/admin?tab=system";
 
-function huellaNpsso(): string | null {
-  const npsso = npssoDelEntorno();
-  return npsso ? createHash("sha256").update(npsso).digest("hex").slice(0, 12) : null;
+function huellaDe(npsso: string): string {
+  return createHash("sha256").update(npsso).digest("hex").slice(0, 12);
+}
+
+/** Huella del NPSSO principal (el de Admin o `PSN_NPSSO`). */
+async function huellaNpsso(): Promise<string | null> {
+  const npsso = await npssoPrincipal();
+  return npsso ? huellaDe(npsso) : null;
 }
 
 async function vistoDesde(userId: string, huella: string): Promise<Date | null> {
@@ -70,19 +76,19 @@ function textoAviso(aviso: AvisoNpsso): { titulo: string; texto: string } {
   if (aviso.tipo === "falta") {
     return {
       titulo: "⚠️ Falta PSN_NPSSO",
-      texto: "El servidor no tiene el NPSSO de PlayStation: la sincronización de PSN está parada. Añádelo en Vercel → Settings → Environment Variables.",
+      texto: "El servidor no tiene el NPSSO de PlayStation: la sincronización de PSN está parada. Pégalo en Admin → Sistema.",
     };
   }
   if (aviso.tipo === "caducado") {
     return {
       titulo: "⚠️ El NPSSO de PSN ha caducado",
       texto:
-        "Sony ya no acepta el PSN_NPSSO del servidor y la sincronización de PSN está parada. Copia uno nuevo de ca.account.sony.com/api/v1/ssocookie con la sesión de PlayStation abierta, cámbialo en Vercel y vuelve a desplegar.",
+        "Sony ya no acepta el PSN_NPSSO del servidor y la sincronización de PSN está parada. Copia uno nuevo de ca.account.sony.com/api/v1/ssocookie con la sesión de PlayStation abierta y pégalo en Admin → Sistema.",
     };
   }
   return {
     titulo: "⏳ El NPSSO de PSN caduca pronto",
-    texto: `Lleva casi 2 meses en uso: le quedan unos ${aviso.diasRestantes} días. Renuévalo en Vercel antes de que se pare la sincronización de PSN.`,
+    texto: `Lleva casi 2 meses en uso: le quedan unos ${aviso.diasRestantes} días. Renuévalo en Admin → Sistema antes de que se pare la sincronización de PSN.`,
   };
 }
 
@@ -91,8 +97,8 @@ export async function revisarCredencialPsn(ahora = new Date()): Promise<AvisoNps
   const desarrollador = await idDesarrollador();
   if (!desarrollador) return null;
 
-  const configurado = isPsnConfigured();
-  const huella = huellaNpsso();
+  const huella = await huellaNpsso();
+  const configurado = huella !== null;
   let falla = false;
   if (configurado) {
     try {
@@ -133,8 +139,8 @@ export type EstadoCredencialPsn =
 
 /** Para Admin → Sistema: lo que sabe la base, sin llamar a Sony. */
 export async function estadoCredencialPsn(userId: string, ahora = new Date()): Promise<EstadoCredencialPsn> {
-  const huella = huellaNpsso();
-  if (!isPsnConfigured() || !huella) return { estado: "falta" };
+  const huella = await huellaNpsso();
+  if (!huella) return { estado: "falta" };
   const [ultimoOk, ultimoFallo] = await Promise.all([ultimo(userId, huella, "ok"), ultimo(userId, huella, "fallo")]);
   // Caducado solo si lo último que se sabe de este NPSSO es un rechazo.
   if (ultimoFallo && (!ultimoOk || ultimoFallo > ultimoOk)) return { estado: "caducado" };
@@ -154,9 +160,9 @@ export type ResultadoComprobacion = {
 };
 
 export async function comprobarCredencialPsnAhora(userId: string): Promise<ResultadoComprobacion> {
-  const npsso = npssoDelEntorno();
+  const npsso = await npssoPrincipal();
   if (!npsso) return { resultado: "falta", detalle: null };
-  const huella = huellaNpsso();
+  const huella = huellaDe(npsso);
   // Uno bueno son 64 letras y números: otra cosa es que se pegó mal.
   const forma = `NPSSO de ${npsso.length} caracteres${/^[A-Za-z0-9]{64}$/.test(npsso) ? "" : " (uno válido tiene 64 letras y números)"}, huella ${huella}`;
   olvidarTokenPsn();
@@ -173,5 +179,31 @@ export async function comprobarCredencialPsnAhora(userId: string): Promise<Resul
     await db.insert(notificationLog).values({ userId, tipo: TIPO_VISTO, clave: huella }).onConflictDoNothing();
     await apuntarUltimo(userId, huella, "ok");
   }
+  return { resultado: "ok", detalle: forma };
+}
+
+/**
+ * Admin → Sistema → «Guardar» (15 nov 2026): pega un NPSSO nuevo. Se prueba
+ * con Sony ANTES de guardarlo, para no cambiar uno que funciona por uno mal
+ * copiado. Si Sony lo acepta, se guarda cifrado en la base, manda sobre
+ * `PSN_NPSSO` y la sincronización sigue sin redesplegar nada.
+ */
+export async function guardarNpssoNuevo(userId: string, pegado: string): Promise<ResultadoComprobacion> {
+  const npsso = npssoDelEntorno(pegado);
+  if (!npsso) return { resultado: "falta", detalle: null };
+  const huella = huellaDe(npsso);
+  const forma = `NPSSO de ${npsso.length} caracteres${/^[A-Za-z0-9]{64}$/.test(npsso) ? "" : " (uno válido tiene 64 letras y números)"}, huella ${huella}`;
+  try {
+    await codigoDesdeNpsso(npsso);
+  } catch (error) {
+    if (!(error instanceof PsnAuthError)) {
+      return { resultado: "sin-respuesta", detalle: `${forma} · ${error instanceof Error ? error.message : String(error)}` };
+    }
+    return { resultado: "caducado", detalle: `${forma} · Sony: ${error.detalle ?? error.message}` };
+  }
+  await guardarNpsso(npsso);
+  olvidarTokenPsn();
+  await db.insert(notificationLog).values({ userId, tipo: TIPO_VISTO, clave: huella }).onConflictDoNothing();
+  await apuntarUltimo(userId, huella, "ok");
   return { resultado: "ok", detalle: forma };
 }

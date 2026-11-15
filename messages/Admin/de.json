@@ -68,7 +68,7 @@
       "steam": "Steam Web API",
       "xbox": "OpenXBL (Ratenbegrenzungsmodus)",
       "psnFalta": "PSN_NPSSO fehlt: PSN synchronisiert nicht",
-      "psnCaducado": "NPSSO abgelaufen: in Vercel erneuern",
+      "psnCaducado": "NPSSO abgelaufen: unten einen neuen einfügen",
       "psnDias": "Läuft in etwa {dias} Tagen ab",
       "psnSinDatos": "Noch keine Daten (der Cron trägt sie ein)",
       "cron": "Sync-Cron",
@@ -79,8 +79,13 @@
       "psnComprobar": "Jetzt prüfen",
       "psnComprobando": "Wird geprüft…",
       "psnAhoraOk": "Sony akzeptiert das NPSSO: PSN synchronisiert wieder.",
-      "psnAhoraCaducado": "Sony lehnt dieses NPSSO ab. Kopiere es erneut bei offener playstation.com-Sitzung und melde dich dort danach nicht ab (das macht es ungültig). Hast du nach der Änderung neu deployt?",
-      "psnAhoraSinRespuesta": "PSN antwortet gerade nicht; versuch es später noch einmal."
+      "psnAhoraCaducado": "Sony lehnt dieses NPSSO ab. Kopiere es erneut bei offener playstation.com-Sitzung und melde dich dort danach nicht ab (das macht es ungültig).",
+      "psnAhoraSinRespuesta": "PSN antwortet gerade nicht; versuch es später noch einmal.",
+      "psnPegar": "Neuen NPSSO hier einfügen",
+      "psnGuardar": "Speichern",
+      "psnGuardando": "Wird bei Sony geprüft…",
+      "psnGuardadoOk": "Gespeichert: Sony akzeptiert ihn und PSN synchronisiert wieder, ohne neues Deployment.",
+      "psnAyuda": "Bei PlayStation angemeldet (am besten in einem privaten Fenster, das du danach schließt, ohne dich abzumelden), öffne"
     },
     "recentSyncs": {
       "title": "Letzte Synchronisierungen",

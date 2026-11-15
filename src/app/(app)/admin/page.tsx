@@ -640,6 +640,11 @@ export default async function AdminPage(props: { searchParams: Promise<{ [key: s
                         caducado: t("system.infrastructure.psnAhoraCaducado"),
                         falta: t("system.infrastructure.psnFalta"),
                         "sin-respuesta": t("system.infrastructure.psnAhoraSinRespuesta"),
+                        pegar: t("system.infrastructure.psnPegar"),
+                        guardar: t("system.infrastructure.psnGuardar"),
+                        guardando: t("system.infrastructure.psnGuardando"),
+                        guardadoOk: t("system.infrastructure.psnGuardadoOk"),
+                        ayuda: t("system.infrastructure.psnAyuda"),
                       }}
                     />
                   </div>

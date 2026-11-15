@@ -111,8 +111,27 @@ export async function codigoDesdeNpsso(npsso: string): Promise<string> {
   throw new Error(`PSN no respondió como se esperaba al pedir el acceso (${resumenRespuesta(respuesta.status, destino)}).`);
 }
 
-export function isPsnConfigured(): boolean {
-  return npssoDelEntorno() !== null;
+/**
+ * El NPSSO pegado en Admin → Sistema (15 nov 2026, lib/psn/npssoGuardado.ts),
+ * que manda sobre `PSN_NPSSO`. Importado al vuelo: este módulo no toca la
+ * base por sí solo (los tests lo cargan sin ella).
+ */
+async function npssoGuardado(): Promise<string | null> {
+  try {
+    const { leerNpssoGuardado } = await import("@/lib/psn/npssoGuardado");
+    return await leerNpssoGuardado();
+  } catch {
+    return null;
+  }
+}
+
+/** El NPSSO principal: el de Admin si hay, si no `PSN_NPSSO`. */
+export async function npssoPrincipal(): Promise<string | null> {
+  return (await npssoGuardado()) ?? npssoDelEntorno();
+}
+
+export async function isPsnConfigured(): Promise<boolean> {
+  return (await npssoPrincipal()) !== null;
 }
 
 /** Olvida el token en caché: para comprobar un NPSSO recién puesto sin esperar a que caduque el anterior. */
@@ -177,7 +196,8 @@ export async function getAuthorization(): Promise<AuthorizationPayload> {
     }
   }
 
-  const candidatos = npssosDelEntorno();
+  const guardado = await npssoGuardado();
+  const candidatos = [...new Set([...(guardado ? [guardado] : []), ...npssosDelEntorno()])];
   if (candidatos.length === 0) throw new PsnNotConfiguredError();
 
   // NPSSO de respaldo (5 nov 2026): si Sony rechaza el principal (caducado
@@ -200,8 +220,8 @@ export async function getAuthorization(): Promise<AuthorizationPayload> {
 }
 
 /**
- * Qué NPSSO está funcionando: 0 el principal (`PSN_NPSSO`), 1+ uno de
- * `PSN_NPSSO_RESPALDO`. Para Admin → Sistema y el aviso al desarrollador:
+ * Qué NPSSO está funcionando: 0 el principal (el de Admin o `PSN_NPSSO`),
+ * 1+ uno de los siguientes (`PSN_NPSSO`, `PSN_NPSSO_RESPALDO`). Para Admin → Sistema y el aviso al desarrollador:
  * tirar de respaldo significa que hay que renovar el principal.
  */
 export let npssoEnUso = 0;

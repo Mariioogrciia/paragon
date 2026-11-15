@@ -138,3 +138,5 @@ ir cuando se pause Vercel.
   viejas y deja las dos últimas.
 - **Cambiar una variable**: edita el secret `ENV_PRODUCCION` en GitHub y
   vuelve a lanzar «Desplegar en Cloud Run».
+- **El NPSSO de PSN** (caduca cada pocas semanas) no hace falta cambiarlo
+  ahí: se pega en *Admin → Sistema* y vale al momento, sin redesplegar.

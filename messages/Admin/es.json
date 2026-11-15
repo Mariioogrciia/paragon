@@ -68,7 +68,7 @@
       "steam": "Steam Web API",
       "xbox": "OpenXBL (Rate limit mode)",
       "psnFalta": "Falta PSN_NPSSO: PSN no sincroniza",
-      "psnCaducado": "NPSSO caducado: renuévalo en Vercel",
+      "psnCaducado": "NPSSO caducado: pega uno nuevo aquí abajo",
       "psnDias": "Caduca en unos {dias} días",
       "psnSinDatos": "Sin datos todavía (los apunta el cron)",
       "cron": "Cron de sincronización",
@@ -79,8 +79,13 @@
       "psnComprobar": "Comprobar ahora",
       "psnComprobando": "Comprobando…",
       "psnAhoraOk": "Sony acepta el NPSSO: PSN vuelve a sincronizar.",
-      "psnAhoraCaducado": "Sony rechaza este NPSSO. Cópialo otra vez con la sesión de playstation.com abierta y no cierres sesión allí después (eso lo invalida). ¿Redesplegaste tras cambiarlo?",
-      "psnAhoraSinRespuesta": "PSN no responde ahora mismo; prueba en un rato."
+      "psnAhoraCaducado": "Sony rechaza este NPSSO. Cópialo otra vez con la sesión de playstation.com abierta y no cierres sesión allí después (eso lo invalida).",
+      "psnAhoraSinRespuesta": "PSN no responde ahora mismo; prueba en un rato.",
+      "psnPegar": "Pega aquí el NPSSO nuevo",
+      "psnGuardar": "Guardar",
+      "psnGuardando": "Probando con Sony…",
+      "psnGuardadoOk": "Guardado: Sony lo acepta y PSN vuelve a sincronizar, sin redesplegar.",
+      "psnAyuda": "Con la sesión de PlayStation abierta (mejor en una ventana de incógnito que luego cierras sin cerrar sesión), abre"
     },
     "recentSyncs": {
       "title": "Sincronizaciones recientes",

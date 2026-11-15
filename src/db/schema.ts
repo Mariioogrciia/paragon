@@ -1540,3 +1540,15 @@ export const retirados = pgTable(
   },
   (t) => [primaryKey({ columns: [t.userId, t.tipo, t.valor] })],
 );
+
+/**
+ * Credenciales del servidor que se cambian desde Admin (15 nov 2026,
+ * lib/psn/npssoGuardado.ts): el NPSSO de PSN caduca cada pocas semanas y
+ * cambiarlo en `ENV_PRODUCCION` obligaba a editar el secret y redesplegar.
+ * `valor` va cifrado con lib/cifrado.ts.
+ */
+export const credencialesServidor = pgTable("credencial_servidor", {
+  nombre: text("nombre").primaryKey(),
+  valor: text("valor").notNull(),
+  actualizadaAt: timestamp("actualizadaAt", { mode: "date" }).notNull().defaultNow(),
+});

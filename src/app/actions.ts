@@ -59,7 +59,7 @@ import { juegosPendientes, saludSincronizacion } from "@/lib/syncHealth";
 import { votarDificultad } from "@/lib/communityDifficulty";
 import type { PlataformaVinculable } from "@/lib/types";
 import { discordUserIdDe, probarDiscordDm, setDiscordDmEnabled } from "@/lib/discordBot";
-import { type ResultadoComprobacion, comprobarCredencialPsnAhora } from "@/lib/credencialPsn";
+import { type ResultadoComprobacion, comprobarCredencialPsnAhora, guardarNpssoNuevo } from "@/lib/credencialPsn";
 import { guardarSuscripcionPush, borrarSuscripcionPush, enviarPush } from "@/lib/webPush";
 import { setHiddenNavItems } from "@/lib/navPreferences";
 import { setPanelOculto } from "@/lib/panelPreferences";
@@ -1013,6 +1013,17 @@ export async function comprobarNpssoAction(): Promise<ResultadoComprobacion | nu
   const profile = await getProfileByUserId(userId);
   if (!profile?.esDesarrollador) return null;
   const resultado = await comprobarCredencialPsnAhora(userId);
+  revalidatePath("/admin");
+  return resultado;
+}
+
+/** Admin → Sistema: pegar un NPSSO nuevo (15 nov 2026). Se prueba con Sony antes de guardarlo. */
+export async function guardarNpssoAction(pegado: string): Promise<ResultadoComprobacion | null> {
+  const userId = await requireUserId();
+  const profile = await getProfileByUserId(userId);
+  if (!profile?.esDesarrollador) return null;
+  const resultado = await guardarNpssoNuevo(userId, String(pegado ?? "").slice(0, 2000));
+  if (resultado.resultado === "ok") await registrar("info", "admin", "NPSSO de PSN renovado desde Admin", {});
   revalidatePath("/admin");
   return resultado;
 }

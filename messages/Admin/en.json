@@ -68,7 +68,7 @@
       "steam": "Steam Web API",
       "xbox": "OpenXBL (Rate limit mode)",
       "psnFalta": "PSN_NPSSO missing: PSN isn't syncing",
-      "psnCaducado": "NPSSO expired: renew it in Vercel",
+      "psnCaducado": "NPSSO expired: paste a new one below",
       "psnDias": "Expires in about {dias} days",
       "psnSinDatos": "No data yet (the cron records it)",
       "cron": "Sync cron",
@@ -79,8 +79,13 @@
       "psnComprobar": "Check now",
       "psnComprobando": "Checking…",
       "psnAhoraOk": "Sony accepts the NPSSO: PSN syncing is back.",
-      "psnAhoraCaducado": "Sony rejects this NPSSO. Copy it again with your playstation.com session open and don't sign out there afterwards (that invalidates it). Did you redeploy after changing it?",
-      "psnAhoraSinRespuesta": "PSN isn't responding right now; try again in a while."
+      "psnAhoraCaducado": "Sony rejects this NPSSO. Copy it again with your playstation.com session open and don't sign out there afterwards (that invalidates it).",
+      "psnAhoraSinRespuesta": "PSN isn't responding right now; try again in a while.",
+      "psnPegar": "Paste the new NPSSO here",
+      "psnGuardar": "Save",
+      "psnGuardando": "Checking with Sony…",
+      "psnGuardadoOk": "Saved: Sony accepts it and PSN syncs again, no redeploy needed.",
+      "psnAyuda": "Signed in to PlayStation (ideally in a private window you then close without signing out), open"
     },
     "recentSyncs": {
       "title": "Recent syncs",

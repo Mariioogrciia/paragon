@@ -91,6 +91,13 @@ const TABLAS: Record<string, string> = {
       "creadoAt" timestamp NOT NULL DEFAULT now(),
       PRIMARY KEY ("userId", "tipo", "valor")
     );`,
+  // El NPSSO de PSN puesto desde Admin (15 nov 2026, lib/psn/npssoGuardado.ts).
+  credencial_servidor: `
+    CREATE TABLE IF NOT EXISTS "credencial_servidor" (
+      "nombre" text PRIMARY KEY,
+      "valor" text NOT NULL,
+      "actualizadaAt" timestamp NOT NULL DEFAULT now()
+    );`,
 };
 
 async function main() {
