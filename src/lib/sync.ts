@@ -282,8 +282,14 @@ async function saveLibrary(userId: string, library: Game[]): Promise<void> {
         set: {
           // `least(100, …)`: un porcentaje mal contado por la plataforma (390 %)
           // se quedaba para siempre, porque aquí solo puede subir.
-          progressPercent: sql`least(100, greatest(${userGames.progressPercent}, excluded."progressPercent"))`,
-          earnedTotal: sql`greatest(${userGames.earnedTotal}, excluded."earnedTotal")`,
+          // PlayStation (15 nov 2026): lo de Sony tal cual, sin `greatest`.
+          // Con «solo sube», un número mal contado una vez (un GTA V al
+          // 390 %, 27 trofeos donde la consola dice 25) se quedaba para
+          // siempre; y el porcentaje de Sony SÍ baja de verdad cuando sale un
+          // DLC con trofeos nuevos. El «solo sube» es para las demás, que
+          // juntan varias cuentas o mandan 0 hasta tener el detalle.
+          progressPercent: sql`case when ${userGames.gameId} like 'psn-%' then least(100, excluded."progressPercent") else least(100, greatest(${userGames.progressPercent}, excluded."progressPercent")) end`,
+          earnedTotal: sql`case when ${userGames.gameId} like 'psn-%' then excluded."earnedTotal" else greatest(${userGames.earnedTotal}, excluded."earnedTotal") end`,
           earned: sql`coalesce(excluded."earned", ${userGames.earned})`,
           // `greatest` (ignora los null) en vez de quedarse con lo último: con
           // dos cuentas de Steam que tienen el mismo juego (ver
@@ -849,13 +855,23 @@ export async function syncGameTrophies(
   // Steam y Xbox comparten el mismo motivo: ninguna de las dos da el
   // progreso en la llamada de biblioteca, así que se calcula aquí, con los
   // logros de verdad ya en la mano — igual que definedTotal más abajo.
+  // PlayStation (15 nov 2026): el porcentaje lo da Sony (por metales), pero
+  // la cuenta de trofeos y la de cada metal salen de la lista de verdad,
+  // con todos los grupos y DLC: el resumen de la biblioteca a veces viene
+  // mal y aquí se corrige al abrir el juego.
+  const porMetal = (g: string) => trophies.filter((t) => t.earned && t.grade === g).length;
   const progreso =
     platform === "steam" || platform === "xbox" || platform === "epic" || platform === "retro"
       ? {
           earnedTotal,
           progressPercent: Math.round((earnedTotal / trophies.length) * 100),
         }
-      : {};
+      : platform === "psn"
+        ? {
+            earnedTotal,
+            earned: { platinum: porMetal("platinum"), gold: porMetal("gold"), silver: porMetal("silver"), bronze: porMetal("bronze") },
+          }
+        : {};
 
   await db
     .update(userGames)
