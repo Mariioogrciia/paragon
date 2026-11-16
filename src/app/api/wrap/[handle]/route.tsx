@@ -6,6 +6,7 @@ import { imagenSegura } from "@/lib/og/imagenSegura";
 import { juegoDestacado } from "@/components/ParagonWrap";
 import { wrapAnual } from "@/lib/wrapAnual";
 import { mejorMesDe } from "@/components/wrap/GraficasWrap";
+import { origenPublico } from "@/lib/site";
 
 /**
  * Imagen compartible del Paragon Wrap (`/u/[handle]`).
@@ -28,7 +29,7 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ handle: string }> },
 ) {
-  const dominio = new URL(request.url).host;
+  const dominio = new URL(origenPublico(request)).host;
   const { handle } = await params;
 
   const profile = await getProfileByHandle(handle);

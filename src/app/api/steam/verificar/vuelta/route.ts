@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { accountFor, getProfileByUserId, linkAccount, PlatformAccountAlreadyLinkedError } from "@/lib/profiles";
 import { steamIdConfirmado } from "@/lib/steam/openid";
 import { marcarVerificada } from "@/lib/verificacion";
+import { urlPublica } from "@/lib/site";
 
 /**
  * Vuelta de "Verificar con Steam" (ver ../route.ts y lib/steam/openid.ts).
@@ -15,7 +16,7 @@ import { marcarVerificada } from "@/lib/verificacion";
 export const maxDuration = 60;
 
 export async function GET(req: Request) {
-  const url = new URL(req.url);
+  const url = urlPublica(req);
   const volver = (resultado: string) => {
     const r = NextResponse.redirect(`${url.origin}/ajustes/plataformas?steam=${resultado}`);
     r.cookies.delete({ name: "steam_openid", path: "/api/steam/verificar" });

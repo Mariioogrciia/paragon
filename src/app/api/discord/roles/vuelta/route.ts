@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { auth } from "@/auth";
 import { usuarioParagonDeDiscord } from "@/lib/discordBot";
 import { actualizarRolesDiscord, canjearCodigoRoles, guardarConexionRoles } from "@/lib/discordRoles";
+import { urlPublica } from "@/lib/site";
 
 /**
  * Vuelta del OAuth de Linked Roles. La cuenta de Paragon sale del Discord
@@ -9,7 +10,7 @@ import { actualizarRolesDiscord, canjearCodigoRoles, guardarConexionRoles } from
  * la sesión abierta en este navegador. Sin ninguna de las dos, a /entrar.
  */
 export async function GET(req: NextRequest) {
-  const url = new URL(req.url);
+  const url = urlPublica(req);
   const origen = url.origin;
   const volver = (motivo: string) => {
     const r = NextResponse.redirect(`${origen}/ajustes/discord?roles=${motivo}`);

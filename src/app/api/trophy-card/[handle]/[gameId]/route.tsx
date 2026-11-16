@@ -4,6 +4,7 @@ import { dificultadDeGame, esPlatinoEquivalente } from "@/lib/stats";
 import { imagenSegura } from "@/lib/og/imagenSegura";
 import { esIdioma, type Idioma } from "@/lib/idiomasTrofeo";
 import { historia, TrofeoPlatino } from "@/lib/og/historiaPlatino";
+import { origenPublico } from "@/lib/site";
 
 /**
  * Imagen compartible de un platino (o un 100% de Steam, que cuenta igual —
@@ -70,7 +71,7 @@ export async function GET(
   { params }: { params: Promise<{ handle: string; gameId: string }> },
 ) {
   // El dominio real desde el que se pide (antes ponía "paragon.app", que no es la web).
-  const dominio = new URL(request.url).host;
+  const dominio = new URL(origenPublico(request)).host;
   const { handle, gameId: gameIdRaw } = await params;
   const gameId = decodeURIComponent(gameIdRaw);
 

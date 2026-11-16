@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { urlAutorizarRoles } from "@/lib/discordRoles";
+import { origenPublico } from "@/lib/site";
 
 /**
  * "Linked Roles Verification URL" del bot (lib/discordRoles.ts): Discord
@@ -9,7 +10,7 @@ import { urlAutorizarRoles } from "@/lib/discordRoles";
  * "Verificar con Steam".
  */
 export async function GET(req: Request) {
-  const origen = new URL(req.url).origin;
+  const origen = origenPublico(req);
   const estado = randomUUID();
   const destino = urlAutorizarRoles(origen, estado);
   if (!destino) return NextResponse.redirect(`${origen}/ajustes/discord?roles=sin-configurar`);

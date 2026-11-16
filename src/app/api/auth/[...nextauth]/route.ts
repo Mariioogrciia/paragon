@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { handlers } from "@/auth";
 import { urlSinIssDelProveedor } from "@/lib/authIss";
 import { destinoFalloEpic } from "@/lib/epicVuelta";
+import { urlPublica } from "@/lib/site";
 
 export const { POST } = handlers;
 
@@ -12,7 +13,7 @@ export const { POST } = handlers;
 export async function GET(req: NextRequest) {
   const limpia = urlSinIssDelProveedor(new URL(req.url));
   const respuesta = await handlers.GET(limpia ? new NextRequest(limpia, { headers: req.headers }) : req);
-  const destino = destinoFalloEpic(new URL(req.url), respuesta, req.headers.get("cookie"));
+  const destino = destinoFalloEpic(urlPublica(req), respuesta, req.headers.get("cookie"));
   if (!destino) return respuesta;
   // Mismas cabeceras (ahí van las cookies que Auth.js borra del intento), otro destino.
   const cabeceras = new Headers(respuesta.headers);

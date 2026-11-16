@@ -13,6 +13,7 @@ import { contieneLenguajeOfensivo } from "@/lib/contentFilter";
 import { isHandleTaken } from "@/lib/profiles";
 import { COLOR_RE, HANDLE_RE, esUrlHttp, esZonaHoraria } from "@/lib/validacionPerfil";
 import { limitar } from "@/lib/rateLimit";
+import { origenPublico } from "@/lib/site";
 
 const TEMAS_VALIDOS = ["dark", "light", "oled", "high-contrast"];
 
@@ -20,10 +21,10 @@ export async function POST(request: Request) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.redirect(new URL("/entrar", request.url));
+      return NextResponse.redirect(new URL("/entrar", origenPublico(request)));
     }
     if (!(await limitar("perfil", session.user.id))) {
-      return NextResponse.redirect(new URL("/ajustes?error=demasiados_intentos", request.url));
+      return NextResponse.redirect(new URL("/ajustes?error=demasiados_intentos", origenPublico(request)));
     }
 
     const formData = await request.formData();
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
       (v): v is string => Boolean(v && v.trim()),
     );
     if (textosAComprobar.some((texto) => contieneLenguajeOfensivo(texto))) {
-      return NextResponse.redirect(new URL("/ajustes?error=contenido_ofensivo", request.url));
+      return NextResponse.redirect(new URL("/ajustes?error=contenido_ofensivo", origenPublico(request)));
     }
 
     // Mismas reglas que `chooseHandleAction` (actions.ts) y
@@ -62,10 +63,10 @@ export async function POST(request: Request) {
     const handleNormalizado = handle?.trim().toLowerCase() || null;
     if (handleNormalizado) {
       if (!HANDLE_RE.test(handleNormalizado)) {
-        return NextResponse.redirect(new URL("/ajustes?error=handle_invalido", request.url));
+        return NextResponse.redirect(new URL("/ajustes?error=handle_invalido", origenPublico(request)));
       }
       if (await isHandleTaken(handleNormalizado, session.user.id)) {
-        return NextResponse.redirect(new URL("/ajustes?error=handle_cogido", request.url));
+        return NextResponse.redirect(new URL("/ajustes?error=handle_cogido", origenPublico(request)));
       }
     }
 
@@ -84,7 +85,7 @@ export async function POST(request: Request) {
       (color && !COLOR_RE.test(color)) ||
       !esZonaHoraria(zona)
     ) {
-      return NextResponse.redirect(new URL("/ajustes?error=datos_invalidos", request.url));
+      return NextResponse.redirect(new URL("/ajustes?error=datos_invalidos", origenPublico(request)));
     }
 
     // El desplegable de /ajustes dice "Nivel 10+/50+/100+", pero hasta ahora
@@ -146,9 +147,9 @@ export async function POST(request: Request) {
     }).where(eq(users.id, session.user.id));
 
     // Redirect back to settings page
-    return NextResponse.redirect(new URL("/ajustes", request.url));
+    return NextResponse.redirect(new URL("/ajustes", origenPublico(request)));
   } catch (error) {
     console.error("Error updating profile:", error);
-    return NextResponse.redirect(new URL("/ajustes?error=update_failed", request.url));
+    return NextResponse.redirect(new URL("/ajustes?error=update_failed", origenPublico(request)));
   }
 }

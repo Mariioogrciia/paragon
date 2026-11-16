@@ -33,6 +33,25 @@ export function dominioProduccion(): string | null {
 }
 
 /**
+ * El origen público para construir URLs a partir de una petición (16 nov
+ * 2026). En Cloud Run, `request.url` lleva la dirección interna del
+ * contenedor (`http://0.0.0.0:8080`), no el dominio: las redirecciones
+ * mandaban ahí al navegador (ERR_ADDRESS_INVALID al guardar el perfil) y las
+ * vueltas de Steam y Discord se pedían a una dirección imposible. En
+ * producción hay un solo dominio, así que se usa siempre; en local, el de la
+ * petición.
+ */
+export function origenPublico(req: Request): string {
+  return dominioProduccion() ? `https://${DOMINIO}` : new URL(req.url).origin;
+}
+
+/** `request.url` con el origen público: misma ruta y consulta. */
+export function urlPublica(req: Request): URL {
+  const interna = new URL(req.url);
+  return new URL(interna.pathname + interna.search, origenPublico(req));
+}
+
+/**
  * Los perfiles públicos de quien hace Paragon: los mismos enlaces que el pie
  * (components/Footer.tsx). Van en los datos estructurados del sitio
  * (lib/datosEstructurados.ts) para que los buscadores sepan quién está detrás.

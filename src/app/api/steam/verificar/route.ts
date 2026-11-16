@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { urlLoginSteam } from "@/lib/steam/openid";
+import { origenPublico } from "@/lib/site";
 
 /**
  * "Verificar con Steam" (22 oct 2026): manda a Steam a iniciar sesión y vuelve
@@ -10,7 +11,7 @@ import { urlLoginSteam } from "@/lib/steam/openid";
  */
 export async function GET(req: Request) {
   const session = await auth();
-  const origen = new URL(req.url).origin;
+  const origen = origenPublico(req);
   if (!session?.user?.id) return NextResponse.redirect(`${origen}/entrar`);
 
   const n = randomUUID();
