@@ -9,6 +9,10 @@ describe("mismoTitulo", () => {
     expect(mismoTitulo("Ghost of Tsushima Director's Cut", "Ghost of Tsushima")).toBe(true);
     expect(mismoTitulo("ELDEN RING™", "Elden Ring")).toBe(true);
     expect(mismoTitulo("The Last of Us™ Remastered", "The Last of Us")).toBe(true);
+    expect(mismoTitulo("Minecraft: PlayStation®4 Edition", "Minecraft")).toBe(true);
+    expect(mismoTitulo("The Forest", "The Forest")).toBe(true);
+    expect(mismoTitulo("Ratchet & Clank: Rift Apart", "Ratchet and Clank: Rift Apart")).toBe(true);
+    expect(mismoTitulo("NieR:Automata™", "NieR: Automata")).toBe(true);
   });
 
   it("rechaza otro juego", () => {
@@ -18,5 +22,7 @@ describe("mismoTitulo", () => {
     expect(mismoTitulo("Gran Turismo 7", "Grand Theft Auto V")).toBe(false);
     expect(mismoTitulo("Spider-Man", "Spider-Man: Miles Morales")).toBe(false);
     expect(mismoTitulo("FIFA 23", "FIFA 22")).toBe(false);
+    expect(mismoTitulo("The Forest", "Sons of the Forest")).toBe(false);
+    expect(mismoTitulo("The Forest", "The Forest Quartet")).toBe(false);
   });
 });

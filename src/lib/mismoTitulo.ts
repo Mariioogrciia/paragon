@@ -19,6 +19,8 @@ function palabras(titulo: string): string[] {
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "")
     .toLowerCase()
+    // «PlayStation®4 Edition», «PS5™»: la consola no es parte del nombre.
+    .replace(/playstation\s*[®™]?\s*[345]\b/g, " ")
     .replace(/&/g, " and ")
     .replace(/[^\p{L}\p{N}]+/gu, " ")
     .split(" ")

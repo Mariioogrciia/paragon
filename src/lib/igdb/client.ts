@@ -184,6 +184,8 @@ export type ReleasePrecision = "day" | "month" | "quarter" | "year" | "tbd";
 export interface IgdbGameResult {
   igdbId: number;
   title: string;
+  /** Los `alternative_names` de IGDB (16 nov 2026), para emparejar por nombre. */
+  nombresAlternativos?: string[];
   coverUrl?: string;
   /** Timestamp de IGDB en ISO. Ojo: exacto solo si `releasePrecision` es "day". */
   releaseDate?: string;
@@ -271,6 +273,7 @@ function formatGame(g: IgdbGame): IgdbGameResult {
   return {
     igdbId: g.id,
     title: g.name,
+    nombresAlternativos: (g.alternative_names ?? []).map((a) => a.name),
     coverUrl: coverUrl(g.cover?.image_id),
     releaseDate: g.first_release_date
       ? new Date(g.first_release_date * 1000).toISOString()
@@ -287,7 +290,7 @@ function formatGame(g: IgdbGame): IgdbGameResult {
 }
 
 const FIELDS =
-  "fields name, cover.image_id, first_release_date, release_dates.date, release_dates.human, " +
+  "fields name, alternative_names.name, cover.image_id, first_release_date, release_dates.date, release_dates.human, " +
   "platforms.abbreviation, platforms.name, genres.name, involved_companies.company.name, " +
   "involved_companies.developer, involved_companies.publisher, summary, age_ratings.organization, age_ratings.rating_category, category;";
 
@@ -560,9 +563,16 @@ export async function searchGamesWithFallback(title: string, limit = 1): Promise
   // cuando el juego de verdad también está en la lista.
   const CANDIDATOS = Math.max(limit, 8);
 
+  // Solo resultados que se llaman como el juego (16 nov 2026): antes valía
+  // el primero de la búsqueda, y «The Forest» se emparejaba con «Sons of the
+  // Forest» — con su carátula, que sustituía a la del juego bueno en toda la
+  // web. Si ninguno se llama igual, mejor sin emparejar que con otro juego.
   for (const variante of variantesDe(title)) {
     const resultados = await searchGames(variante, CANDIDATOS);
-    if (resultados.length > 0) return porPrioridad(resultados).slice(0, limit);
+    const buenos = resultados.filter((r) =>
+      [r.title, ...(r.nombresAlternativos ?? [])].some((n) => mismoTitulo(n, title) || mismoTitulo(n, variante)),
+    );
+    if (buenos.length > 0) return porPrioridad(buenos).slice(0, limit);
   }
 
   return [];
@@ -1113,12 +1123,19 @@ export async function fechasLanzamiento(igdbIds: number[]): Promise<Map<number, 
  */
 export async function arteSiEsElJuego(igdbId: number, titulo: string): Promise<string | null> {
   if (!Number.isInteger(igdbId) || igdbId <= 0) return null;
-  const [fila] = await query<{ id: number; name?: string; artworks?: { image_id: string }[]; screenshots?: { image_id: string }[] }>(
+  const [fila] = await query<{
+    id: number;
+    name?: string;
+    alternative_names?: { name: string }[];
+    artworks?: { image_id: string }[];
+    screenshots?: { image_id: string }[];
+  }>(
     "games",
-    `fields id, name, artworks.image_id, screenshots.image_id; where id = ${igdbId}; limit 1;`,
+    `fields id, name, alternative_names.name, artworks.image_id, screenshots.image_id; where id = ${igdbId}; limit 1;`,
     86_400,
   );
-  if (!fila?.name || !mismoTitulo(fila.name, titulo)) return null;
+  const nombres = [fila?.name, ...(fila?.alternative_names ?? []).map((a) => a.name)].filter((n): n is string => Boolean(n));
+  if (!nombres.some((n) => mismoTitulo(n, titulo))) return null;
   const imagen = fila.artworks?.[0]?.image_id ?? fila.screenshots?.[0]?.image_id;
   return imagen ? `https://images.igdb.com/igdb/image/upload/t_1080p/${imagen}.jpg` : null;
 }
