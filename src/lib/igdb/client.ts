@@ -1,4 +1,5 @@
 import "server-only";
+import { mismoTitulo } from "@/lib/mismoTitulo";
 
 /**
  * Cliente de IGDB (Twitch).
@@ -1105,6 +1106,23 @@ export async function fechasLanzamiento(igdbIds: number[]): Promise<Map<number, 
  * primera captura. Una sola cláusula `fields` (ver la trampa de IGDB en
  * HANDOFF: dos `fields` descartan parte de lo pedido en silencio).
  */
+/**
+ * El arte de un juego para el fondo del perfil, solo si IGDB lo llama como
+ * nuestro juego (16 nov 2026): el emparejamiento por título a veces se lleva
+ * otro, y el fondo salía de un juego que no era el elegido.
+ */
+export async function arteSiEsElJuego(igdbId: number, titulo: string): Promise<string | null> {
+  if (!Number.isInteger(igdbId) || igdbId <= 0) return null;
+  const [fila] = await query<{ id: number; name?: string; artworks?: { image_id: string }[]; screenshots?: { image_id: string }[] }>(
+    "games",
+    `fields id, name, artworks.image_id, screenshots.image_id; where id = ${igdbId}; limit 1;`,
+    86_400,
+  );
+  if (!fila?.name || !mismoTitulo(fila.name, titulo)) return null;
+  const imagen = fila.artworks?.[0]?.image_id ?? fila.screenshots?.[0]?.image_id;
+  return imagen ? `https://images.igdb.com/igdb/image/upload/t_1080p/${imagen}.jpg` : null;
+}
+
 export async function artesPorIgdb(igdbIds: number[]): Promise<Map<number, string>> {
   const ids = [...new Set(igdbIds)].filter((id) => Number.isInteger(id) && id > 0).slice(0, 100);
   if (ids.length === 0) return new Map();

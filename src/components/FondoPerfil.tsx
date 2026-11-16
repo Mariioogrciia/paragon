@@ -1,4 +1,4 @@
-import { artesPorIgdb } from "@/lib/igdb/client";
+import { arteSiEsElJuego } from "@/lib/igdb/client";
 
 /**
  * Capas de fondo de la cabecera del perfil (PerfilJugador.tsx).
@@ -39,11 +39,11 @@ export function CapaFondo({ url, modo }: { url: string; modo: "banner" | "caratu
  * (IGDB está en EE. UU. y la función en Fráncfort). Ahora la página sale ya
  * y el arte entra en cuanto llega; sin IGDB o si tarda, se queda la carátula.
  */
-export async function ArteDeFondo({ igdbId, caratula }: { igdbId: number; caratula: string }) {
+export async function ArteDeFondo({ igdbId, titulo, caratula }: { igdbId: number; titulo: string; caratula: string }) {
+  // Solo si IGDB lo llama como nuestro juego (16 nov 2026): si el
+  // emparejamiento se llevó otro, mejor la carátula del bueno.
   const arte = await Promise.race([
-    artesPorIgdb([igdbId])
-      .then((m) => m.get(igdbId) ?? null)
-      .catch(() => null),
+    arteSiEsElJuego(igdbId, titulo).catch(() => null),
     new Promise<null>((r) => setTimeout(() => r(null), 4000)),
   ]);
   return <CapaFondo url={arte ?? caratula} modo={arte ? "arte" : "caratula"} />;

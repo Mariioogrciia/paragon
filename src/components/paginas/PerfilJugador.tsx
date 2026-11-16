@@ -376,7 +376,7 @@ export async function PerfilJugador({
             (fondoEsCaratulaSuelta && backgroundGame?.igdbId ? (
               // El arte de IGDB no frena la página: sale la carátula y el arte entra al llegar (FondoPerfil.tsx).
               <Suspense fallback={<CapaFondo url={backgroundImage} modo="caratula" />}>
-                <ArteDeFondo igdbId={backgroundGame.igdbId} caratula={backgroundImage} />
+                <ArteDeFondo igdbId={backgroundGame.igdbId} titulo={backgroundGame.title} caratula={backgroundImage} />
               </Suspense>
             ) : (
               <CapaFondo url={backgroundImage} modo={fondoEsCaratulaSuelta ? "caratula" : "banner"} />
