@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Barlow, Chakra_Petch, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next";
 import { NextIntlClientProvider, type AbstractIntlMessages } from "next-intl";
 import { PublicidadScripts } from "@/components/PublicidadScripts";
@@ -29,26 +29,45 @@ import "./globals.css";
  * por props.
  */
 
-const barlow = Barlow({
-  subsets: ["latin"],
+// Fuentes servidas desde el repo (17 nov 2026, src/app/fuentes, de los
+// paquetes @fontsource; licencia OFL al lado). Con next/font/google se
+// bajaban de Google al compilar, y un cambio en lo que devuelve Google
+// rompió el build de Turbopack («next/font/google queries have exactly one
+// entry») y paró todos los despliegues. Mismos pesos y subconjunto latino.
+const barlow = localFont({
   // 300: la página de PlayStation ("cada una en su casa") usa Barlow ligera.
-  weight: ["300", "400", "500", "600", "700"],
+  src: [
+    { path: "./fuentes/barlow-latin-300-normal.woff2", weight: "300", style: "normal" },
+    { path: "./fuentes/barlow-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "./fuentes/barlow-latin-500-normal.woff2", weight: "500", style: "normal" },
+    { path: "./fuentes/barlow-latin-600-normal.woff2", weight: "600", style: "normal" },
+    { path: "./fuentes/barlow-latin-700-normal.woff2", weight: "700", style: "normal" },
+  ],
   variable: "--font-barlow",
+  display: "swap",
 });
 
-const chakra = Chakra_Petch({
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
+const chakra = localFont({
+  src: [
+    { path: "./fuentes/chakra-petch-latin-500-normal.woff2", weight: "500", style: "normal" },
+    { path: "./fuentes/chakra-petch-latin-600-normal.woff2", weight: "600", style: "normal" },
+    { path: "./fuentes/chakra-petch-latin-700-normal.woff2", weight: "700", style: "normal" },
+  ],
   variable: "--font-chakra",
+  display: "swap",
 });
 
 // Solo se usa cuando el visitante elige el estilo "Terminal" (ver
 // ThemeCustomizer.tsx / .estilo-terminal en globals.css) — se expone siempre
 // como variable CSS, cargada una vez, y esa clase decide si se aplica.
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
+const jetbrainsMono = localFont({
+  src: [
+    { path: "./fuentes/jetbrains-mono-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "./fuentes/jetbrains-mono-latin-500-normal.woff2", weight: "500", style: "normal" },
+    { path: "./fuentes/jetbrains-mono-latin-700-normal.woff2", weight: "700", style: "normal" },
+  ],
   variable: "--font-jetbrains-mono",
+  display: "swap",
 });
 
 // Lo que enseña Google bajo el título (21 oct 2026): con las palabras que
