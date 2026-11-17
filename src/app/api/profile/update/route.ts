@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { getDb } from "@/db";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { getParagonLevel } from "@/lib/paragonLevel";
 import { BANNER_REQUISITOS, FRAME_INSIGNIA, FRAME_REQUISITOS, marcoDisponible } from "@/lib/level";
 import { bannerPresetKey } from "@/lib/bannerPresets";
@@ -127,10 +127,18 @@ export async function POST(request: Request) {
     // We update everything but the email, because email is linked to the OAuth provider
 
     const db = getDb();
+    // El nombre que ven los demás es el de estos dos campos (17 nov 2026):
+    // antes se guardaban aparte y en el perfil, rankings y comentarios salía
+    // siempre el nombre completo que dio Google o Discord al registrarse.
+    // Vacíos, se ve el @.
+    const nombre = firstName?.trim().slice(0, 50) || null;
+    const apellido = lastName?.trim().slice(0, 50) || null;
+    const nombreVisible = [nombre, apellido].filter(Boolean).join(" ");
     await db.update(users).set({
       ...(handleNormalizado ? { handle: handleNormalizado } : {}),
-      firstName: firstName?.trim().slice(0, 50) || null,
-      lastName: lastName?.trim().slice(0, 50) || null,
+      firstName: nombre,
+      lastName: apellido,
+      name: nombreVisible || sql`coalesce(${handleNormalizado}, ${users.handle})`,
       timezone: zona,
       profileTitle: profileTitle?.trim().slice(0, 60) || null,
       profileBackgroundGameId: profileBackgroundGameId?.trim().slice(0, 200) || null,

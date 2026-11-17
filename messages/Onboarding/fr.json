@@ -362,7 +362,8 @@
       "profileTitlePlaceholder": "Ex. Chasseur de platine",
       "backgroundGameLabel": "Jeu pour le fond",
       "statusLabel": "Statut",
-      "statusPlaceholder": "À quoi joues-tu ?"
+      "statusPlaceholder": "À quoi joues-tu ?",
+      "nombreVisibleAyuda": "C'est le nom que les autres voient sur ton profil, dans les classements et les commentaires. Laisse les deux vides pour afficher ton @."
     },
     "visual": {
       "title": "Personnalisation visuelle",

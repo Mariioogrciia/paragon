@@ -33,7 +33,7 @@ import { TrophyRecommendations } from "@/components/TrophyRecommendations";
 import { paragonProgress } from "@/lib/level";
 import { PLATFORM_LABEL } from "@/lib/types";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
-import { esPlatinoEquivalente } from "@/lib/stats";
+import { esPlatinoEquivalente, nadaQueCazar } from "@/lib/stats";
 import { Landing } from "@/components/landing/Portada";
 import { SlidersHorizontal } from "lucide-react";
 import { getPanelOculto, type SeccionPanel } from "@/lib/panelPreferences";
@@ -556,7 +556,7 @@ async function Inicio() {
             cazas={cazas}
             max={MAX_CAZAS}
             candidatos={sinRetirados(games, marcas)
-              .filter((g) => !g.isWishlist && g.platform !== "manual" && g.definedTotal > 0 && !esPlatinoEquivalente(g))
+              .filter((g) => !g.isWishlist && g.platform !== "manual" && g.definedTotal > 0 && !nadaQueCazar(g))
               .map((g) => ({ id: g.id, titulo: g.title, iconUrl: g.iconUrl ?? null, percent: g.progressPercent }))}
             textos={{
               titulo: t("cazas.titulo"),

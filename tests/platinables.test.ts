@@ -31,6 +31,10 @@ describe("platinables", () => {
         juego("b", { def: 50, gan: 49, pct: 98, platform: "steam", platino: false }),
         juego("c", { def: 30, gan: 10, pct: 33 }),
         juego("hecho", { def: 20, gan: 20, pct: 100, platform: "steam", platino: false }),
+        // PSN sin platino al 100 % (17 nov 2026): no es platino, pero no le queda nada.
+        juego("psnSinPlatino", { def: 12, gan: 12, pct: 100, platino: false }),
+        // Xbox al 100 %: tampoco.
+        juego("xboxCompleto", { def: 30, gan: 30, pct: 100, platform: "xbox", platino: false }),
         juego("deseado", { def: 20, gan: 19, pct: 95, isWishlist: true }),
         juego("nuevo", { def: 20, gan: 0, pct: 0 }),
       ],

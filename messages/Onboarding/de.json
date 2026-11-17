@@ -362,7 +362,8 @@
       "profileTitlePlaceholder": "Z. B. Platin-Jäger",
       "backgroundGameLabel": "Spiel für den Hintergrund",
       "statusLabel": "Status",
-      "statusPlaceholder": "Was spielst du gerade?"
+      "statusPlaceholder": "Was spielst du gerade?",
+      "nombreVisibleAyuda": "So sehen dich andere in deinem Profil, in Ranglisten und Kommentaren. Lässt du beide leer, wird dein @ angezeigt."
     },
     "visual": {
       "title": "Visuelle Anpassung",

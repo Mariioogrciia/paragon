@@ -123,10 +123,15 @@ export function ProfileForm({
   // saber si hay algo distinto de lo guardado — antes "Guardar cambios"
   // estaba siempre activo, aunque no se hubiera tocado nada. Los valores
   // iniciales (memorizados una vez) son la base de comparación.
+  // Sin nombre y apellido propios, se parte el nombre que dio Google o
+  // Discord (17 nov 2026): es el que se ve en el perfil, y así guardar otra
+  // cosa (el fondo, el color) no lo cambia sin querer.
+  const [nombreOAuth, ...apellidosOAuth] = (user.name ?? "").trim().split(/\s+/);
+  const sinNombrePropio = user.firstName == null && user.lastName == null;
   const inicial = useState(() => ({
     handle: user.handle ?? "",
-    firstName: user.firstName ?? "",
-    lastName: user.lastName ?? "",
+    firstName: user.firstName ?? (sinNombrePropio ? nombreOAuth ?? "" : ""),
+    lastName: user.lastName ?? (sinNombrePropio ? apellidosOAuth.join(" ") : ""),
     statusText: user.statusText ?? "",
     profileColor: user.profileColor ?? "#3b82f6",
     theme: user.theme ?? "dark",
@@ -343,6 +348,9 @@ export function ProfileForm({
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.details.lastNameLabel")}</label>
               <input name="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} className="w-full rounded-xl border border-border bg-[var(--surface)] px-4 py-3 text-sm focus:border-accent focus:outline-none" />
             </div>
+            {/* El nombre que ven los demás (17 nov 2026): antes estos campos no
+                cambiaban nada y en el perfil salía siempre el nombre de Google. */}
+            <p className="-mt-2 text-xs text-muted sm:col-span-2">{t("profileForm.details.nombreVisibleAyuda")}</p>
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted">{t("profileForm.details.profileTitleLabel")}</label>
               <input

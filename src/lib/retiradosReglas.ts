@@ -7,7 +7,7 @@
  * la Vita lo puedes seguir jugando ahí.
  */
 import type { Game } from "@/lib/types";
-import { esPlatinoEquivalente } from "@/lib/stats";
+import { nadaQueCazar } from "@/lib/stats";
 
 export interface Retirados {
   dispositivos: Set<string>;
@@ -43,7 +43,7 @@ export function cazasDeBiblioteca(games: Game[], marcas: Pick<Marcas, "cazas" | 
   const porId = new Map(games.map((g) => [g.id, g]));
   return marcas.cazas
     .map((id) => porId.get(id))
-    .filter((g): g is Game => g !== undefined && !esPlatinoEquivalente(g) && !juegoRetirado(g, marcas));
+    .filter((g): g is Game => g !== undefined && !nadaQueCazar(g) && !juegoRetirado(g, marcas));
 }
 
 const DIA_MS = 86_400_000;

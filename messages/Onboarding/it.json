@@ -362,7 +362,8 @@
       "profileTitlePlaceholder": "Es. Cacciatore di platini",
       "backgroundGameLabel": "Gioco per lo sfondo",
       "statusLabel": "Stato",
-      "statusPlaceholder": "A cosa stai giocando?"
+      "statusPlaceholder": "A cosa stai giocando?",
+      "nombreVisibleAyuda": "È il nome che gli altri vedono nel tuo profilo, nelle classifiche e nei commenti. Se li lasci vuoti, si vede il tuo @."
     },
     "visual": {
       "title": "Personalizzazione visiva",

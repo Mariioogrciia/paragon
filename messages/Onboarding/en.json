@@ -362,7 +362,8 @@
       "profileTitlePlaceholder": "E.g. Platinum hunter",
       "backgroundGameLabel": "Background game",
       "statusLabel": "Status",
-      "statusPlaceholder": "What are you playing?"
+      "statusPlaceholder": "What are you playing?",
+      "nombreVisibleAyuda": "This is the name others see on your profile, rankings and comments. Leave both empty to show your @ instead."
     },
     "visual": {
       "title": "Visual customization",

@@ -13,7 +13,7 @@
  * `tests/platinables.test.ts`.
  */
 import type { Game } from "@/lib/types";
-import { esPlatinoEquivalente } from "@/lib/stats";
+import { esPlatinoEquivalente, nadaQueCazar } from "@/lib/stats";
 import { dispositivosDe } from "@/lib/retiradosReglas";
 
 export interface Platinable {
@@ -64,7 +64,9 @@ function candidato(g: Game): boolean {
     g.platform !== "manual" &&
     g.definedTotal > 0 &&
     g.earnedTotal > 0 &&
-    !esPlatinoEquivalente(g)
+    // No solo sin platino: un juego sin platino al 100 % tampoco tiene nada
+    // que cazar (salía con «faltan 0», 17 nov 2026).
+    !nadaQueCazar(g)
   );
 }
 

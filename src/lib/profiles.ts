@@ -280,7 +280,9 @@ export async function handleDe(userId: string): Promise<string | null> {
 }
 
 export async function setProfileInfo(userId: string, name: string, image: string | null) {
-  await db.update(users).set({ name, image }).where(eq(users.id, userId));
+  // Nombre y apellido de la web, a null (17 nov 2026): así el formulario de
+  // Ajustes de la web se rellena con este nombre y no lo pisa al guardar.
+  await db.update(users).set({ name, image, firstName: null, lastName: null }).where(eq(users.id, userId));
 }
 
 export async function grantBadge(userId: string, badgeId: string) {

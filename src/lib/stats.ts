@@ -59,6 +59,22 @@ export function esPlatinoEquivalente(
   return (game.platform === "steam" || game.platform === "retro") && game.progressPercent === 100;
 }
 
+/**
+ * ¿Queda algo por cazar en este juego? (17 nov 2026). No es lo mismo que
+ * `esPlatinoEquivalente`: un juego de PSN SIN platino al 100 % no cuenta como
+ * platino (ni en rankings ni en el perfil), pero ya no le queda nada, y salía
+ * en «A un paso del platino» con «faltan 0». Para listas de lo pendiente.
+ */
+export function nadaQueCazar(
+  game: Pick<Game, "earned" | "platform" | "progressPercent" | "earnedTotal" | "definedTotal">,
+): boolean {
+  return (
+    esPlatinoEquivalente(game) ||
+    game.progressPercent >= 100 ||
+    (game.definedTotal > 0 && game.earnedTotal >= game.definedTotal)
+  );
+}
+
 export function gameProgress(game: Game): GameProgress {
   const earned = game.earnedTotal;
   const total = game.definedTotal;
