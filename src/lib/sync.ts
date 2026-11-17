@@ -669,7 +669,7 @@ async function syncStoreMetadata(gameId: string, nativeId: string): Promise<void
   let igdbId: number | null = null;
   if (row?.title) {
     try {
-      igdbId = (await searchGamesWithFallback(row.title, 1))[0]?.igdbId ?? null;
+      igdbId = (await searchGamesWithFallback(row.title, 1, "steam"))[0]?.igdbId ?? null;
     } catch {
       // Sin IGDB no pasa nada: el resto de metadatos de Steam sigue
       // guardándose igual más abajo.
@@ -707,7 +707,7 @@ async function syncIgdbMetadata(gameId: string, title: string): Promise<void> {
   if (row?.syncedAt) return;
 
   try {
-    const results = await searchGamesWithFallback(title, 1);
+    const results = await searchGamesWithFallback(title, 1, parseGameKey(gameId).platform);
     const metadata = results[0];
     
     // We mark it as synced even if we found nothing, so we don't query IGDB every time.

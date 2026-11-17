@@ -72,25 +72,6 @@ jobs:
           echo "::add-mask::$URL_BASE"
           cd "$RUNNER_TEMP/migrar" && DATABASE_URL="$URL_BASE" npx --no-install tsx crear-tablas-noviembre-2026.mts
 
-      # Emparejamientos con IGDB que son de otro juego (16 nov 2026): «The
-      # Forest» acabó como «Sons of the Forest», con su carátula. Idempotente;
-      # si falla, no para el despliegue.
-      - name: Revisar emparejamientos con IGDB
-        continue-on-error: true
-        run: |
-          T="$RUNNER_TEMP/migrar"
-          mkdir -p "$T/scripts/migraciones" "$T/src/lib"
-          cp scripts/migraciones/revisar-igdb.mts "$T/scripts/migraciones/"
-          cp src/lib/mismoTitulo.ts "$T/src/lib/"
-          # Las variables pasan de Node al script sin pasar por la shell (la
-          # contraseña de la base puede llevar caracteres especiales).
-          cd "$T" && node -e "
-            const e = require('dotenv').parse(require('fs').readFileSync(process.argv[1]));
-            for (const k of ['IGDB_CLIENT_ID', 'IGDB_CLIENT_SECRET']) if (e[k]) console.log('::add-mask::' + e[k]);
-            const env = { ...process.env, DATABASE_URL: e.DIRECT_URL || e.DATABASE_URL || '', IGDB_CLIENT_ID: e.IGDB_CLIENT_ID || '', IGDB_CLIENT_SECRET: e.IGDB_CLIENT_SECRET || '' };
-            require('child_process').execFileSync('npx', ['--no-install', 'tsx', 'scripts/migraciones/revisar-igdb.mts'], { stdio: 'inherit', env });
-          " "$RUNNER_TEMP/compilar.env"
-
       - uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_CLAVE }}
@@ -128,7 +109,30 @@ jobs:
             --concurrency 40 \
             --timeout 300 \
             --quiet
-          rm -f "$RUNNER_TEMP/ejecutar.yaml" "$RUNNER_TEMP/compilar.env"
+          # compilar.env lo usa aún la revisión de IGDB, abajo.
+          rm -f "$RUNNER_TEMP/ejecutar.yaml"
+
+      # Emparejamientos con IGDB que son de otro juego (16 nov 2026): «The
+      # Forest» acabó como «Märchen Forest», con su carátula. Idempotente; si
+      # falla, no para el despliegue. DESPUÉS de desplegar (17 nov 2026):
+      # antes, la revisión vieja seguía sirviendo unos minutos y volvía a
+      # emparejar mal lo recién deshecho.
+      - name: Revisar emparejamientos con IGDB
+        continue-on-error: true
+        run: |
+          T="$RUNNER_TEMP/migrar"
+          mkdir -p "$T/scripts/migraciones" "$T/src/lib"
+          cp scripts/migraciones/revisar-igdb.mts "$T/scripts/migraciones/"
+          cp src/lib/mismoTitulo.ts "$T/src/lib/"
+          # Las variables pasan de Node al script sin pasar por la shell (la
+          # contraseña de la base puede llevar caracteres especiales).
+          cd "$T" && node -e "
+            const e = require('dotenv').parse(require('fs').readFileSync(process.argv[1]));
+            for (const k of ['IGDB_CLIENT_ID', 'IGDB_CLIENT_SECRET']) if (e[k]) console.log('::add-mask::' + e[k]);
+            const env = { ...process.env, DATABASE_URL: e.DIRECT_URL || e.DATABASE_URL || '', IGDB_CLIENT_ID: e.IGDB_CLIENT_ID || '', IGDB_CLIENT_SECRET: e.IGDB_CLIENT_SECRET || '' };
+            require('child_process').execFileSync('npx', ['--no-install', 'tsx', 'scripts/migraciones/revisar-igdb.mts'], { stdio: 'inherit', env });
+          " "$RUNNER_TEMP/compilar.env"
+          rm -f "$RUNNER_TEMP/compilar.env"
 
       # Sin --provenance ni --sbom la imagen es un único manifiesto (antes
       # buildx colgaba de ella una «atestación» que Google no deja borrar

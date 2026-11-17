@@ -1,5 +1,5 @@
 import "server-only";
-import { mismoTitulo } from "@/lib/mismoTitulo";
+import { esElMismoJuego, salioEn } from "@/lib/mismoTitulo";
 
 /**
  * Cliente de IGDB (Twitch).
@@ -290,9 +290,16 @@ function formatGame(g: IgdbGame): IgdbGameResult {
 }
 
 const FIELDS =
-  "fields name, alternative_names.name, cover.image_id, first_release_date, release_dates.date, release_dates.human, " +
+  "fields name, cover.image_id, first_release_date, release_dates.date, release_dates.human, " +
   "platforms.abbreviation, platforms.name, genres.name, involved_companies.company.name, " +
   "involved_companies.developer, involved_companies.publisher, summary, age_ratings.organization, age_ratings.rating_category, category;";
+
+/**
+ * FIELDS más los nombres alternativos (17 nov 2026), solo donde se empareja
+ * por nombre (la búsqueda y los alias): en las listas grandes (próximos,
+ * novedades, hasta 500 juegos) serían docenas de nombres por juego para nada.
+ */
+const FIELDS_CON_ALIAS = FIELDS.replace("fields name,", "fields name, alternative_names.name,");
 
 /**
  * Filtro `platforms.abbreviation = (...)` de APIcalypse, para las páginas de
@@ -479,7 +486,7 @@ export async function searchGames(title: string, limit = 12): Promise<IgdbGameRe
   const escaped = title.replace(/"/g, '\\"');
   const games = await query<IgdbGame>(
     "games",
-    `${FIELDS} search "${escaped}"; where cover != null; limit ${limit};`,
+    `${FIELDS_CON_ALIAS} search "${escaped}"; where cover != null; limit ${limit};`,
     // Las búsquedas del usuario no se cachean tanto: quiere ver lo que hay
     // ahora, no lo que había hace 6 horas.
     300,
@@ -557,20 +564,22 @@ function variantesDe(title: string): string[] {
  * por eso cae en la ficha por-plataforma en vez de la global (ver
  * `getGlobalGame` en lib/community.ts).
  */
-export async function searchGamesWithFallback(title: string, limit = 1): Promise<IgdbGameResult[]> {
+export async function searchGamesWithFallback(title: string, limit = 1, plataforma?: string): Promise<IgdbGameResult[]> {
   // Se pide más de lo que se va a devolver (`limit`) a propósito: hace falta
   // ver varios candidatos para poder descartar los que sean port/dlc/mod
   // cuando el juego de verdad también está en la lista.
   const CANDIDATOS = Math.max(limit, 8);
 
-  // Solo resultados que se llaman como el juego (16 nov 2026): antes valía
-  // el primero de la búsqueda, y «The Forest» se emparejaba con «Sons of the
-  // Forest» — con su carátula, que sustituía a la del juego bueno en toda la
-  // web. Si ninguno se llama igual, mejor sin emparejar que con otro juego.
+  // Solo resultados que son el juego (16 nov 2026): antes valía el primero de
+  // la búsqueda, y «The Forest» se emparejaba con «Märchen Forest», con su
+  // carátula, que sustituía a la del juego bueno en toda la web. La regla es
+  // la misma que usa la revisión del despliegue (esElMismoJuego), para que lo
+  // que se empareja aquí no se deshaga allí. Con `plataforma`, además, que
+  // haya salido en ella: desempata «God of War» de 2018 (PS4) y de 2005 (PS2).
   for (const variante of variantesDe(title)) {
     const resultados = await searchGames(variante, CANDIDATOS);
-    const buenos = resultados.filter((r) =>
-      [r.title, ...(r.nombresAlternativos ?? [])].some((n) => mismoTitulo(n, title) || mismoTitulo(n, variante)),
+    const buenos = resultados.filter(
+      (r) => esElMismoJuego([r.title, ...(r.nombresAlternativos ?? [])], title) && (!plataforma || salioEn(r.platforms, plataforma)),
     );
     if (buenos.length > 0) return porPrioridad(buenos).slice(0, limit);
   }
@@ -1033,7 +1042,7 @@ export async function matchIgdbGames(
 
       const porAlias = await query<IgdbGame>(
         "games",
-        `${FIELDS} where alternative_names.name = (${alias}); limit 400;`,
+        `${FIELDS_CON_ALIAS} where alternative_names.name = (${alias}); limit 400;`,
       );
 
       const gamePorAlias = new Map<string, IgdbGameResult>();
@@ -1110,13 +1119,6 @@ export async function fechasLanzamiento(igdbIds: number[]): Promise<Map<number, 
 }
 
 /**
- * Arte grande de varios juegos en UNA consulta — para el destacado a
- * pantalla completa de las páginas de plataforma ("cada una en su casa",
- * 1 oct 2026). Artwork si lo hay (es arte promocional sin texto); si no, la
- * primera captura. Una sola cláusula `fields` (ver la trampa de IGDB en
- * HANDOFF: dos `fields` descartan parte de lo pedido en silencio).
- */
-/**
  * El arte de un juego para el fondo del perfil, solo si IGDB lo llama como
  * nuestro juego (16 nov 2026): el emparejamiento por título a veces se lleva
  * otro, y el fondo salía de un juego que no era el elegido.
@@ -1135,11 +1137,18 @@ export async function arteSiEsElJuego(igdbId: number, titulo: string): Promise<s
     86_400,
   );
   const nombres = [fila?.name, ...(fila?.alternative_names ?? []).map((a) => a.name)].filter((n): n is string => Boolean(n));
-  if (!nombres.some((n) => mismoTitulo(n, titulo))) return null;
+  if (!esElMismoJuego(nombres, titulo)) return null;
   const imagen = fila.artworks?.[0]?.image_id ?? fila.screenshots?.[0]?.image_id;
   return imagen ? `https://images.igdb.com/igdb/image/upload/t_1080p/${imagen}.jpg` : null;
 }
 
+/**
+ * Arte grande de varios juegos en UNA consulta — para el destacado a
+ * pantalla completa de las páginas de plataforma ("cada una en su casa",
+ * 1 oct 2026). Artwork si lo hay (es arte promocional sin texto); si no, la
+ * primera captura. Una sola cláusula `fields` (ver la trampa de IGDB en
+ * HANDOFF: dos `fields` descartan parte de lo pedido en silencio).
+ */
 export async function artesPorIgdb(igdbIds: number[]): Promise<Map<number, string>> {
   const ids = [...new Set(igdbIds)].filter((id) => Number.isInteger(id) && id > 0).slice(0, 100);
   if (ids.length === 0) return new Map();

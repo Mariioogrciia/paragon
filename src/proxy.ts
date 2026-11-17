@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { defaultLocale, locales } from "@/i18n/idiomas";
+import { origenPublico } from "@/lib/site";
 
 /**
  * Páginas públicas desde la CDN (21 oct 2026). Quien llega SIN sesión a la
@@ -19,8 +20,9 @@ export function proxy(request: NextRequest) {
   // La copia interna no se enlaza nunca: si alguien llega a ella, a la URL buena.
   const interna = /^\/p\/[^/]+(\/.*)?$/.exec(pathname);
   if (interna) {
-    const url = request.nextUrl.clone();
-    url.pathname = interna[1] ?? "/";
+    // Con el dominio público: en Cloud Run, nextUrl lleva la dirección interna
+    // del contenedor (0.0.0.0:8080) y la redirección mandaba ahí (17 nov 2026).
+    const url = new URL((interna[1] ?? "/") + request.nextUrl.search, origenPublico(request));
     return NextResponse.redirect(url, 308);
   }
 
