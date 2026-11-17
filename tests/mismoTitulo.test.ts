@@ -14,6 +14,7 @@ describe("mismoTitulo", () => {
     expect(mismoTitulo("Ratchet & Clank: Rift Apart", "Ratchet and Clank: Rift Apart")).toBe(true);
     expect(mismoTitulo("NieR:Automata™", "NieR: Automata")).toBe(true);
     expect(mismoTitulo("DIRT5", "Dirt 5")).toBe(true);
+    expect(mismoTitulo("EA SPORTS™UFC®4", "EA Sports UFC 4")).toBe(true);
     expect(mismoTitulo("Tearaway™ PS Vita", "Tearaway")).toBe(true);
     // Los que el primer despliegue deshizo siendo buenos (16 nov 2026).
     expect(mismoTitulo("The Elder Scrolls IV: Oblivion Game of the Year Edition (2009)", "The Elder Scrolls IV: Oblivion")).toBe(true);

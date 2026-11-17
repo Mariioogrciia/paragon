@@ -41,7 +41,8 @@ function palabras(titulo: string): string[] {
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "")
     .toLowerCase()
-    .replace(/[®™©]/g, "")
+    // Por un espacio, no por nada: «EA SPORTS™UFC®4» quedaba «sportsufc4».
+    .replace(/[®™©]/g, " ")
     .replace(/&/g, " and ");
   for (const f of FRASES) t = t.replace(f, " ");
   return (
