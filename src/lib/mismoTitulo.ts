@@ -12,6 +12,8 @@ const COLETILLAS = new Set([
   "the", "of", "a", "an", "and", "edition", "trophies", "trophy", "ps3", "ps4", "ps5", "vita", "psvita",
   "playstation", "remastered", "remaster", "definitive", "goty", "year", "complete", "deluxe", "standard", "pc",
   "director", "directors", "cut", "s",
+  // «Game of the Year Edition», «Classic Edition», «Trophy Set», «for PlayStation®».
+  "game", "classic", "set", "for",
 ]);
 
 function palabras(titulo: string): string[] {
@@ -21,6 +23,8 @@ function palabras(titulo: string): string[] {
     .toLowerCase()
     // «PlayStation®4 Edition», «PS5™»: la consola no es parte del nombre.
     .replace(/playstation\s*[®™]?\s*[345]\b/g, " ")
+    // El año entre paréntesis: «Oblivion GOTY Edition (2009)».
+    .replace(/\(\s*(19|20)\d\d\s*\)/g, " ")
     .replace(/&/g, " and ")
     .replace(/[^\p{L}\p{N}]+/gu, " ")
     .split(" ")
