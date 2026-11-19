@@ -49,7 +49,7 @@ import { apuntarPasadaCron, idDesarrollador } from "@/lib/avisoDesarrollador";
  */
 
 /** Segundos de la función. Vercel corta a 60 en el plan Hobby. */
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 /**
  * Presupuesto real de tiempo, en ms — no los 60s de `maxDuration` de arriba.
@@ -69,7 +69,13 @@ export const maxDuration = 60;
  * petición en sí, DNS, TLS...) la función tiene que devolver su respuesta
  * bastante antes de que cron-job.org se rinda.
  */
-const PRESUPUESTO_MS = 22_000;
+const PRESUPUESTO_MS = 70_000;
+// Cloud Run (19 nov 2026): de 22 s a 70 s. Lo de arriba es de cuando lo
+// llamaba cron-job.org con su tope de 30 s; ahora lo llaman GitHub Actions
+// (curl con --max-time 200) y Cloud Scheduler, y Cloud Run aguanta 300 s.
+// Con 22 s (y el tope duro de 27 s) una biblioteca grande no terminaba
+// NUNCA desde el cron: salía «sin respuesta tras 27s» en cada pasada. 70 s
+// cada 30 min son ~100.000 s de CPU al mes, dentro de la capa gratuita.
 
 /**
  * Cuántos USUARIOS se intentan como mucho en una pasada — es solo un tope,
@@ -85,7 +91,7 @@ const PRESUPUESTO_MS = 22_000;
  * mucho, esto habrá que revisarlo otra vez (más usuarios reales = cada uno
  * vuelve a esperar más, haga lo que haga este número).
  */
-const POR_PASADA = 4;
+const POR_PASADA = 10; // 19 nov 2026: con 70 s de presupuesto caben más (el bucle corta igual al acabarse).
 
 /** Horas mínimas entre dos resincronizaciones completas de la misma persona desde el cron. */
 const HORAS_ENTRE_RESYNC = 2;
@@ -144,7 +150,7 @@ const MARGEN_MS = 8_000;
  * pasada entera esperaba hasta que Vercel la mataba. Con esto, la pasada
  * abandona esa cuenta (queda para la siguiente) y responde igualmente.
  */
-const LIMITE_DURO_MS = PRESUPUESTO_MS + 5_000;
+const LIMITE_DURO_MS = PRESUPUESTO_MS + 40_000; // 110 s: una biblioteca grande que empieza tarde aún termina.
 
 function conTope<T>(trabajo: Promise<T>, arranque: number): Promise<T> {
   const restante = Math.max(arranque + LIMITE_DURO_MS - Date.now(), 0);

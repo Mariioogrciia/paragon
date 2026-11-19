@@ -13,9 +13,11 @@ Lo que hay en el repo:
   la variable `GCP_PROYECTO` en GitHub.
 - `scripts/cloudrun/entorno.mjs`: convierte el `.env` de producción en lo que
   piden la compilación y Cloud Run (quita las variables de Vercel).
-- `.github/workflows/sync-frecuente.yml`: los crons (sincronizar cada 4 h y la
-  foto de las ligas los lunes) llaman a `SITE_URL`, así que siguen funcionando
-  después del cambio de dominio sin tocar nada.
+- `.github/workflows/sync-frecuente.yml`: los crons de GitHub (sincronizar y
+  la foto de las ligas los lunes). Ojo: GitHub retrasa mucho los programados
+  en repos con poca actividad (pedido cada 30 min, llegaba cada 6-9 h), así
+  que el bueno es el de Cloud Scheduler (abajo, paso 7); el de GitHub queda
+  de respaldo.
 
 ## Pasos (una sola vez)
 
@@ -140,3 +142,25 @@ ir cuando se pause Vercel.
   vuelve a lanzar «Desplegar en Cloud Run».
 - **El NPSSO de PSN** (caduca cada pocas semanas) no hace falta cambiarlo
   ahí: se pega en *Admin → Sistema* y vale al momento, sin redesplegar.
+
+### 7. Cron fiable con Cloud Scheduler (19 nov 2026)
+
+El cron de GitHub Actions se pide cada 30 min, pero GitHub lo lanzaba cada
+6-9 h: un trofeo nuevo tardaba medio día en aparecer. Cloud Scheduler da 3
+trabajos gratis al mes. En Cloud Shell (el secreto lo escribes tú ahí; es el
+`CRON_SECRET` de `ENV_PRODUCCION`, no lo pegues en ningún chat):
+
+```bash
+gcloud services enable cloudscheduler.googleapis.com
+read -s -p "CRON_SECRET: " CRON_SECRET; echo
+gcloud scheduler jobs create http paragon-sync \
+  --location=europe-west1 \
+  --schedule="*/30 * * * *" \
+  --uri="https://www.paragontrophies.com/api/cron/sync" \
+  --http-method=GET \
+  --headers="Authorization=Bearer $CRON_SECRET" \
+  --attempt-deadline=300s
+unset CRON_SECRET
+```
+
+Para probarlo sin esperar: `gcloud scheduler jobs run paragon-sync --location=europe-west1`.

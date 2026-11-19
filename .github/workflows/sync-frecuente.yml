@@ -48,7 +48,7 @@ jobs:
           if [ "${{ github.event.schedule }}" = "7 4 * * 1" ]; then ruta=/api/cron/league-snapshot; fi
           echo "Llamando a $ruta"
 
-          respuesta=$(curl -s -o /tmp/resp.json -w "%{http_code}" --max-time 120 \
+          respuesta=$(curl -s -o /tmp/resp.json -w "%{http_code}" --max-time 200 \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             "$SITIO$ruta")
 
